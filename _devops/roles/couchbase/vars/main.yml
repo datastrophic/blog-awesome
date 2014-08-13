@@ -1,0 +1,13 @@
+# Adminisrator user and password
+admin_user: akirillov
+admin_password: password
+
+# ram quota for the cluster
+cluster_ram_quota: 1024
+
+webapp_ram: 1024
+
+# bucket and replicas
+bucket_name: octopus
+bucket_ram_quota: 512
+num_replicas: 0

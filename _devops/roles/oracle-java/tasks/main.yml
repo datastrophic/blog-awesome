@@ -1,0 +1,20 @@
+- name: Check Java Installed
+  shell: dpkg -l | grep -cim1 oracle-java7-installer
+  register: javaInstalled
+  ignore_errors: True
+
+- name: Add Java repository to sources
+  action: apt_repository repo='ppa:webupd8team/java'
+  when: javaInstalled.stdout == '0'
+
+- name: Autoaccept license for Java
+  action: shell echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+  when: javaInstalled.stdout == '0'
+
+- name: Install Java 7
+  apt: pkg=oracle-java7-installer state=present install_recommends=yes update_cache=yes
+  when: javaInstalled.stdout == '0'
+
+- name: Set Java 7 Env
+  apt: pkg=oracle-java7-set-default state=present install_recommends=yes
+  when: javaInstalled.stdout == '0'

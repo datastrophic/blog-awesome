@@ -1,0 +1,32 @@
+- name: Check Couchbase Installed
+  shell: dpkg -l | grep -cim1 couchbase-server
+  register: couchbaseInstalled
+  ignore_errors: True
+
+- name: download Couchbase package
+  get_url: url=http://packages.couchbase.com/releases/2.2.0/couchbase-server-community_2.2.0_x86_64_openssl098.deb dest=~/.
+  when: couchbaseInstalled.stdout == '0'
+
+- name: Install Couchbase .deb file on all machines
+  shell: dpkg -i ~/couchbase-server-community_2.2.0_x86_64_openssl098.deb
+  when: couchbaseInstalled.stdout == '0'
+
+- name: Configure main node
+  shell: /opt/couchbase/bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-init-username={{ admin_user }} --cluster-init-password={{ admin_password }} --cluster-init-port=8091 --cluster-init-ramsize={{ cluster_ram_quota }}
+  when: couchbaseInstalled.stdout == '0'
+
+- name: Create shell script for configuring main node
+  template: src=couchbase-add-node.j2 dest=/tmp/addnodes.sh mode=750
+  when: couchbaseInstalled.stdout == '0'
+
+- name: Launch config script
+  action: shell /tmp/addnodes.sh
+  when: couchbaseInstalled.stdout == '0'
+
+- name: Rebalance the cluster
+  shell: /opt/couchbase/bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u {{ admin_user }} -p {{ admin_password }}
+  when: couchbaseInstalled.stdout == '0'
+
+- name: create bucket {{ bucket_name }} with {{ num_replicas }} replicas
+  shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket={{ bucket_name }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ bucket_ram_quota }}  --bucket-replica={{ num_replicas }} -u {{ admin_user }} -p {{ admin_password }}
+  when: couchbaseInstalled.stdout == '0'

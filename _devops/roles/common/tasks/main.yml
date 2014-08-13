@@ -1,0 +1,14 @@
+- name: Setting Locale to UTF-8
+  shell: locale-gen en_US.UTF-8
+
+- name: Installation of Console Tools
+  apt: name={{ item  }} state=present update_cache=yes
+  with_items:
+    - git
+    - maven
+    - wget
+    - curl
+    - python-software-properties
+    - libssl0.9.8
+    - unzip
+    - tree
