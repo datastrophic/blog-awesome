@@ -1,7 +1,7 @@
 package controllers
 
 import securesocial.core._
-import play.api.mvc.{Action, RequestHeader}
+import play.api.mvc.RequestHeader
 import auth.SocialUser
 
 class Application(override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {

@@ -25,7 +25,7 @@ libraryDependencies ++= Seq(
     "org.webjars" % "jquery" % "2.1.1",
     "org.webjars" % "html5shiv" % "3.7.2",
     "org.webjars" % "respond" % "1.4.2",
-//    "org.webjars" % "bootstrap" % "3.1.1-2" exclude("org.webjars", "jquery"),
-    "org.webjars" % "bootswatch-flatly" % "3.2.0-1" exclude("org.webjars", "jquery"),
-    "org.webjars" % "angularjs" % "1.2.18" exclude("org.webjars", "jquery")
+    "org.webjars" % "font-awesome" % "4.1.0" exclude("org.webjars", "bootstrap"),
+    "org.webjars" % "bootswatch-flatly" % "3.2.0",
+    "org.webjars" % "angularjs" % "1.2.18"
 )

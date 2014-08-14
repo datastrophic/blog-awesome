@@ -1,4 +1,4 @@
-@(message: String)(user: Option[auth.SocialUser])
+@(message: String)(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 @import auth.SocialUser
 
 @home(message)(user)
