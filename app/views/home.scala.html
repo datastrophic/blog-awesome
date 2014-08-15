@@ -4,16 +4,7 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <title>Hey, @{user.map(_.profile.firstName).getOrElse("Nobody")}</title>
-
-        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
-        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/login/login.css")'>
-        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/font-awesome.css"))'>
-        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("html5shiv.js"))'></script>
-        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("respond.js"))'></script>
-        @*-- Add More CSS here -- *@
-    </head>
+    @head()
 
     <body>
         @navbar(user)
@@ -34,7 +25,7 @@
                 <div class="col-md-12">
                         <!-- First Blog Post -->
                     <h2>
-                        <a href="#">Blog Post Title</a>
+                        <a href="/posts/some_post">Blog Post Title</a>
                     </h2>
 
                     <p><span class="glyphicon glyphicon-time"></span> Posted on August 28, 2013 at 10:00 PM</p>
@@ -42,13 +33,13 @@
                     <img class="img-responsive" src="http://placehold.it/900x300" alt="">
                     <hr>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, veritatis, tempora, necessitatibus inventore nisi quam quia repellat ut tempore laborum possimus eum dicta id animi corrupti debitis ipsum officiis rerum.</p>
-                    <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a class="btn btn-primary" href="/posts/some_post">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
 
                     <hr>
 
                         <!-- Second Blog Post -->
                     <h2>
-                        <a href="#">Blog Post Title</a>
+                        <a href="/posts/some_post">Blog Post Title</a>
                     </h2>
 
                     <p><span class="glyphicon glyphicon-time"></span> Posted on August 28, 2013 at 10:45 PM</p>
@@ -56,13 +47,13 @@
                     <img class="img-responsive" src="http://placehold.it/900x300" alt="">
                     <hr>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, quasi, fugiat, asperiores harum voluptatum tenetur a possimus nesciunt quod accusamus saepe tempora ipsam distinctio minima dolorum perferendis labore impedit voluptates!</p>
-                    <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a class="btn btn-primary" href="/posts/some_post">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
 
                     <hr>
 
                         <!-- Third Blog Post -->
                     <h2>
-                        <a href="#">Blog Post Title</a>
+                        <a href="/posts/some_post">Blog Post Title</a>
                     </h2>
 
                     <p><span class="glyphicon glyphicon-time"></span> Posted on August 28, 2013 at 10:45 PM</p>
@@ -70,7 +61,7 @@
                     <img class="img-responsive" src="http://placehold.it/900x300" alt="">
                     <hr>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate, voluptates, voluptas dolore ipsam cumque quam veniam accusantium laudantium adipisci architecto itaque dicta aperiam maiores provident id incidunt autem. Magni, ratione.</p>
-                    <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a class="btn btn-primary" href="/posts/some_post">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
 
                     <hr>
                 </div>
@@ -80,28 +71,10 @@
 
             <hr>
 
-                <!-- Footer -->
-            <footer>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <p>Copyright &copy; Your Website 2014</p>
-                    </div>
-                        <!-- /.col-lg-12 -->
-                </div>
-                    <!-- /.row -->
-            </footer>
+          @footer()
 
         </div>
             <!-- /.container -->
-
-        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.js"))'></script>
-        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
-        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/jquery.bootstrap-autohidingnavbar.min.js")'></script>
-
-        <script>
-            $("div.navbar-fixed-top").autoHidingNavbar();
-        </script>
-
     </body>
 
 </html>

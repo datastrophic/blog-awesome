@@ -8,7 +8,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">Flying Octopus</a>
+        <a class="navbar-brand" href="/">Flying Octopus</a>
     </div>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav">
@@ -54,35 +54,15 @@
     </div>
 </div>
 
-<!-- Login popup -->
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <form>
-                <h3 class="heading-desc">
-                    <a href="" class="close pull-right" aria-hidden="true">×</a>
-                    Login to leave comments</h3>
-                <div class="social-box">
-                    <div class="row mg-btm">
-                        <div class="col-md-12">
-                            <a href="@env.routes.authenticationUrl("facebook", Some("/"))" class="btn btn-primary btn-block">
-                                <i class="fa fa-facebook visible-xs"></i>
-                                <i class="icon-facebook"></i>    Login with Facebook
-                            </a>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a href="@env.routes.authenticationUrl("twitter", Some("/"))" class="btn btn-info btn-block" >
-                                <i class="fa fa-twitter visible-xs"></i>
-                                <i class="icon-twitter"></i>    Login with Twitter
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@login(request, lang, env)
+
+<script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.js"))'></script>
+<script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+<script type='text/javascript' src='@routes.Assets.at("javascripts/external/jquery.bootstrap-autohidingnavbar.min.js")'></script>
+
+<script>
+$("div.navbar-fixed-top").autoHidingNavbar();
+</script>
+
 
 

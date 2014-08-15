@@ -16,20 +16,14 @@ class SocialUserService extends  UserService[SocialUser] with ReactiveCouchbaseC
 
   override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = {
 
-    executeWithBucket(bucket => {
-      bucket.get[SocialUser](s"$providerId::$userId")
-    }).map(customUser => customUser.map(user => user.profile))
+    getUserByKey(s"$providerId::$userId").map(customUser => customUser.map(user => user.profile))
 
   }
 
   override def save(profile: BasicProfile, mode: SaveMode): Future[SocialUser] = {
     val key = s"${profile.providerId}::${profile.userId}"
 
-    executeWithBucket(bucket => {
-
-      bucket.get[SocialUser](key)
-
-    }).map(user => {
+    getUserByKey(key).map(user => {
 
       if(user.isDefined) user.get
 
@@ -45,6 +39,11 @@ class SocialUserService extends  UserService[SocialUser] with ReactiveCouchbaseC
     })
   }
 
+  private def getUserByKey(key: String): Future[Option[SocialUser]] = {
+    executeWithBucket(bucket => {
+      bucket.get[SocialUser](key)
+    })
+  }
 
   //Don't need it now
   override def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] = ???

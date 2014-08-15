@@ -9,6 +9,10 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
   def index = UserAwareAction { implicit request =>
       Ok(views.html.index("Hey, Tony!")(request.user))
   }
+
+  def posts(postName: String) = UserAwareAction { implicit request =>
+    Ok(views.html.post("Hey, Tony!")(request.user))
+  }
 }
 
 // An Authorization implementation that only authorizes uses that logged in using twitter
