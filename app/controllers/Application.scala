@@ -10,6 +10,11 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
       Ok(views.html.index("Hey, Tony!")(request.user))
   }
 
+  def editpost(postName: Option[String]) = UserAwareAction { implicit request =>
+    //TODO: add post contents in case of EDIT action
+    Ok(views.html.editpost("Hey, Tony!")(request.user))
+  }
+
   def posts(postName: String) = UserAwareAction { implicit request =>
     Ok(views.html.post("Hey, Tony!")(request.user))
   }

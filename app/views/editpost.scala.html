@@ -1,0 +1,62 @@
+@(title: String)(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
+@import auth.SocialUser
+
+<!DOCTYPE html>
+
+<html>
+    @head()
+
+    <body>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/sirtrevor/sir-trevor.css")'>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/sirtrevor/sir-trevor-icons.css")'>
+        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.js"))'></script>
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("underscore.js"))'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/eventable/eventable.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/sirtrevor/sir-trevor.min.js")'></script>
+
+        @navbar(user)
+            <!-- Page Content -->
+        <div class="container">
+            <div class="page-header" id="banner" style="padding-top: 60px;">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <input type="text" class="form-control input-lg" placeholder="Post Title">
+                        <hr>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                    <!-- Blog Post Content Column -->
+                <div class="col-md-10 col-md-offset-1">
+                    <form>
+                        <textarea id="postBody" class="js-sir-trevor-instance">{"data":[{"type":"text","data":{"text":"Post preview will be generated from first two data blocks of editor\n"}},{"type":"text","data":{"text":"Post body goes here...\n"}}]}</textarea>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                    </form>
+                    <hr>
+                </div>
+
+            </div>
+            <hr>
+            @footer()
+        </div>
+
+        <script>
+            new SirTrevor.Editor({
+                el: $("#postBody"),
+                blockTypes: ["Text", "Image"]
+            });
+        </script>
+        <script>
+        $(document).ready(function(){
+
+            $("form").submit(function() {
+                alert($("#ta1").val());
+            });
+
+        });
+        </script>
+
+    </body>
+
+</html>
