@@ -1,7 +1,6 @@
 package dao
 
 import db.ReactiveCouchbaseClient
-import domain.HasId
 import scala.concurrent.Future
 
 /**

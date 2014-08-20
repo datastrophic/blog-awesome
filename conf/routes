@@ -8,8 +8,9 @@ GET        /webjars/*file        controllers.WebJarAssets.at(file)
 
 # Home page
 GET        /                     @controllers.Application.index
-GET        /posts/:name          @controllers.Application.posts(name)
-GET        /post/edit           @controllers.Application.editpost(name: Option[String])
+GET        /post/:name           @controllers.Application.posts(name)
+GET        /edit/                @controllers.Application.editpost(name: Option[String])
+POST       /post                 @controllers.Application.uploadPost
 GET        /logout               @controllers.CustomLoginController.logout
 
 ->         /auth                 securesocial.Routes

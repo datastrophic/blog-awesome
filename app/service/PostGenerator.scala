@@ -9,6 +9,11 @@ import java.util.{Calendar, GregorianCalendar, Locale}
  */
 object PostGenerator {
   def generate(amount: Int): List[Post] = {
+    val preview =
+      """
+        |Lorem ipsum dolor sit amet, consectetur
+        |adipisicing elit. Cupiditate, voluptates, voluptas dolore ipsam cumque
+      """.stripMargin
     val body =
       """Lorem ipsum dolor sit amet, consectetur
         |adipisicing elit. Cupiditate, voluptates, voluptas dolore ipsam cumque
@@ -20,7 +25,7 @@ object PostGenerator {
 
     (0 to amount) map { i =>
 
-      Post(i.toString, s"Mock post #$i", body, fmt.format(date), (0 to i) map (t => s"tag_$t") toList)
+      Post(i.toString, s"Mock post #$i", preview, body, fmt.format(date), (0 to i) map (t => s"tag_$t") toList)
 
     } toList
   }

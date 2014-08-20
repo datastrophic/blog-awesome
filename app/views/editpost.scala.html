@@ -21,7 +21,7 @@
             <div class="page-header" id="banner" style="padding-top: 60px;">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
-                        <input type="text" class="form-control input-lg" placeholder="Post Title">
+                        <input id="postTitle" type="text" class="form-control input-lg" placeholder="Post Title">
                         <hr>
                     </div>
                 </div>
@@ -47,14 +47,36 @@
                 blockTypes: ["Text", "Image"]
             });
         </script>
+
+
         <script>
         $(document).ready(function(){
 
             $("form").submit(function() {
-                alert($("#ta1").val());
+                sendPostToServer();
             });
 
         });
+
+        function sendPostToServer() {
+                var postData = {
+                    title : $ ( "#postTitle" ).val ( ),
+                    data: jQuery.parseJSON($("#postBody").val())['data']
+                } ;
+
+                $.ajax({
+                    url: "/post",
+                    type: "POST",
+                    data: JSON.stringify(postData),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    success: function(){
+                        alert("OK")
+                    }
+                })
+        }
+
+
         </script>
 
     </body>
