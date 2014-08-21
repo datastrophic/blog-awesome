@@ -3,15 +3,17 @@
 # ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file         controllers.Assets.at(path="/public", file)
-GET        /webjars/*file        controllers.WebJarAssets.at(file)
+GET         /images/*file         controllers.ExternalAssets.at(path="/tmp/playblog/images", file)
+GET         /assets/*file         controllers.Assets.at(path="/public", file)
+GET         /webjars/*file        controllers.WebJarAssets.at(file)
 
 # Home page
-GET        /                     @controllers.Application.index
-GET        /post/:name           @controllers.Application.posts(name)
-GET        /edit/                @controllers.Application.editpost(name: Option[String])
-POST       /post                 @controllers.Application.uploadPost
-GET        /logout               @controllers.CustomLoginController.logout
+GET         /                     @controllers.Application.index
+GET         /post/:name           @controllers.Application.posts(name)
+GET         /edit                 @controllers.Application.editpost(name: Option[String])
+POST        /post                 @controllers.Application.uploadPost
+GET         /logout               @controllers.CustomLoginController.logout
+POST        /image                @controllers.ImageController.uploadImage
 
-->         /auth                 securesocial.Routes
+->          /auth                 securesocial.Routes
 

@@ -30,7 +30,7 @@
                     <!-- Blog Post Content Column -->
                 <div class="col-md-10 col-md-offset-1">
                     <form>
-                        <textarea id="postBody" class="js-sir-trevor-instance">{"data":[{"type":"text","data":{"text":"Post preview will be generated from first two data blocks of editor\n"}},{"type":"text","data":{"text":"Post body goes here...\n"}}]}</textarea>
+                        <textarea id="postBody" class="js-sir-trevor-instance"></textarea>
                         <button type="submit" class="btn btn-default">Submit</button>
                     </form>
                     <hr>
@@ -46,6 +46,10 @@
                 el: $("#postBody"),
                 blockTypes: ["Text", "Image"]
             });
+
+            SirTrevor.setDefaults({
+                uploadUrl: "/image"
+            });
         </script>
 
 
@@ -53,6 +57,7 @@
         $(document).ready(function(){
 
             $("form").submit(function() {
+                alert(JSON.stringify(jQuery.parseJSON($("#postBody").val())['data']));
                 sendPostToServer();
             });
 
@@ -62,7 +67,7 @@
                 var postData = {
                     title : $ ( "#postTitle" ).val ( ),
                     data: jQuery.parseJSON($("#postBody").val())['data']
-                } ;
+                };
 
                 $.ajax({
                     url: "/post",
