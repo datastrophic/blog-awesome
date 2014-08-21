@@ -7,7 +7,7 @@ import auth.SocialUserFormats._
  */
 object DomainJsonFormats {
 
-  implicit val dataBlockContentFormat = Json.format[BlockContent]
+//  implicit val dataBlockContentFormat = Json.format[BlockContent]
   implicit val dataBlockFormat = Json.format[DataBlock]
   implicit val postDTOFormat= Json.format[PostDTO]
   implicit val commentFormat= Json.format[Comment]

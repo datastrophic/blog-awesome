@@ -4,8 +4,9 @@ import securesocial.core._
 import play.api.mvc.{BodyParsers, RequestHeader}
 import auth.SocialUser
 import play.api.libs.json.{JsError, Json}
-import domain.PostDTO
+import domain.{Post, PostDTO}
 import domain.DomainJsonFormats._
+import util.JsonTransformer
 
 class Application(override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {
 
@@ -24,20 +25,21 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
 
   def uploadPost = UserAwareAction(BodyParsers.parse.json) {
     implicit request =>
-      val placeResult = request.body.validate[PostDTO]
-      placeResult.fold(
-        errors => {
-          println(s"BAD:\n${request.body}\nerrors:$errors")
-          BadRequest(Json.obj("status" -> "KO", "message" -> JsError.toFlatJson(errors)))
-        },
-        postDTO => {
-          println(s"GOOD: $postDTO")
+      println(request.body)
+//      Post(id: String, title: String, preview: String, body: String, date: String, tags: List[String] = List(), comments: List[Comment] = List())
 
-          //TODO: save to DB and redirect
+      val post = JsonTransformer.createPostFromJson(request.body)
 
-          Redirect(routes.Application.posts("11111"))
-        }
-      )
+      if(post.isDefined){
+        //TODO: save post, get ID and redirect to preview
+        println(s"GOOD: ${post.get}")
+        Redirect(routes.Application.posts("11111"))
+      } else {
+        println(s"BAD")
+        BadRequest(Json.obj("status" -> "KO", "message" -> "some errors with json structure"))
+      }
+
+
       //TODO: onSuccess Redirect to draft preview
   }
 
