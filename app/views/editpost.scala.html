@@ -15,7 +15,7 @@
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/eventable/eventable.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/sirtrevor/sir-trevor.min.js")'></script>
 
-        @navbar(user)
+        @navbar(user)(None)
             <!-- Page Content -->
         <div class="container">
             <div class="page-header" id="banner" style="padding-top: 60px;">
@@ -58,7 +58,6 @@
 
             $("form").submit(function(e) {
                 e.preventDefault();
-                alert(JSON.stringify(jQuery.parseJSON($("#postBody").val())['data']));
                 sendPostToServer();
             });
 
@@ -76,8 +75,8 @@
                     data: JSON.stringify(postData),
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',
-                    success: function(){
-
+                    success: function(data){
+                        window.location.href = "/post/"+data['pid'];
                     }
                 })
         }
