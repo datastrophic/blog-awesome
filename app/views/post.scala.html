@@ -11,14 +11,16 @@
     <body>
         @navbar(user)(Some(post))
 
-            <!-- Page Content -->
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
+
+        <!-- Page Content -->
         <div class="container">
             <div class="page-header" id="banner">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
-                        <h1>@post.title</h1>
+                        <h3>@post.title</h3>
                             <!-- Date/Time -->
-                        <p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM</p>
+                        <h6><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM</h6>
                         <hr>
                     </div>
                 </div>
@@ -28,11 +30,21 @@
 
                     <!-- Blog Post Content Column -->
                 <div class="col-md-10 col-md-offset-1">
-
-                    <hr>
-                    @post.body.foreach{block =>{
-                        <div>block.data</div>
-                    }}
+                    @for(block <- post.body){
+                        @{
+                            block.`type` match {
+                             case "text" => {
+                                    <p class="md-content">{block.data}</p>
+                            }
+                             case "image" => {
+                                 <div style="text-align: center">
+                                    <p class="md-content">![]({block.data})</p>
+                                 </div>
+                            }
+                             case _ => {}
+                            }
+                        }
+                    }
                     <hr>
 
                         <!-- Blog Comments -->
@@ -72,12 +84,18 @@
 
 
                 </div>
-            @if(post.isDraft) {
-                <p>Set of editorial buttons here</p>
-            }
             <hr>
           @footer()
         </div>
+        
+        <script>
+
+
+            $( ".md-content" ).each(function( i ) {
+                var $self = $(this);
+                $self.replaceWith(markdown.toHTML($self.text()))
+            });
+        </script>
     </body>
 
 </html>

@@ -28,6 +28,7 @@ libraryDependencies ++= Seq(
     "org.webjars" % "font-awesome" % "4.1.0" exclude("org.webjars", "bootstrap"),
     "org.webjars" % "bootswatch-flatly" % "3.2.0",
     "org.webjars" % "angularjs" % "1.2.18",
+    "org.webjars" % "markdown-js" % "0.5.0-1",
     "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
     "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3",
     "com.sksamuel.scrimage" %% "scrimage-core" % "1.3.20",

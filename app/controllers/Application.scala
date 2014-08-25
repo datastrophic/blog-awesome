@@ -17,17 +17,36 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
       Ok(views.html.index("Hey, Tony!")(request.user))
   }
 
-  def editpost(postName: Option[String]) = UserAwareAction { implicit request =>
-    //TODO: add post contents in case of EDIT action
-    Ok(views.html.editpost("Hey, Tony!")(request.user))
+  def editpost(uid: Option[String]) = UserAwareAction { implicit request =>
+    uid map { uid =>
+      Await.result(PostDAO.get(uid), 5 seconds) map { post =>
+
+        Ok(views.html.editpost(Some(post.title), Some(JsonTransformer.buildSirTrevorBlocks(post).toString()))(request.user))
+      } getOrElse(BadRequest(s"Post with uid $uid not found!"))
+    } getOrElse Ok(views.html.editpost(None, None)(request.user))
   }
 
-  def posts(uid: String) = UserAwareAction { implicit request =>
+  def post(uid: String) = UserAwareAction { implicit request =>
     Await.result(PostDAO.get(uid), 5 seconds) map { post =>
       println(s"uid: $uid\npost: $post")
         Ok(views.html.post(post)(request.user))
       } getOrElse(Redirect("/"))
-    }
+  }
+
+  def submit(uid: String) = UserAwareAction { implicit request =>
+    Await.result(PostDAO.get(uid), 5 seconds) map { post =>
+      val newPost = post.copy(isDraft = false)
+      PostDAO.update(newPost)
+      Redirect("/")
+    } getOrElse(BadRequest(s"Draft with uid $uid does not exist!"))
+  }
+
+  def delete(uid: String) = UserAwareAction { implicit request =>
+    PostDAO.delete(uid)
+    Redirect("/")
+  }
+
+  def drafts = TODO
 
   def uploadPost = UserAwareAction(BodyParsers.parse.json) {
     implicit request =>

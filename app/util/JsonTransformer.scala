@@ -39,6 +39,39 @@ object JsonTransformer {
   private val textTransformer = (__ \ 'data \ 'text).json.pick[JsString]
   private val imageTransformer = (__ \ 'data \ 'file \ 'url).json.pick[JsString]
 
+  def buildSirTrevorBlocks(post: Post): JsValue =
+    Json.obj(
+      "data" -> post.body.map(createBlockJson)
+    )
+
+  private def createBlockJson(dataBlock: DataBlock): JsValue = {
+    dataBlock.`type` match {
+      case "text" => createTextBlock(dataBlock)
+      case "image" => createImageBlock(dataBlock)
+      case _ => Json.obj()
+    }
+  }
+
+  private def createTextBlock(dataBlock: DataBlock): JsValue = {
+    Json.obj(
+      "type" -> "text",
+      "data" -> Json.obj(
+        "text" -> dataBlock.data
+      )
+    )
+  }
+
+  private def createImageBlock(dataBlock: DataBlock): JsValue = {
+    Json.obj(
+      "type" -> "image",
+      "data" -> Json.obj(
+        "file" -> Json.obj(
+          "url" -> dataBlock.data
+        )
+      )
+    )
+  }
+
   def createPostFromJson(json: JsValue): Option[Post] = {
     getStringValue(json, titleTransformer) flatMap {
       title =>
