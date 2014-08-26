@@ -17,7 +17,8 @@
                 @*<li><a href="#">Blog</a></li>*@
                 @if(post.get.isDraft){
                     <li><a href="/edit?uid=@{post.get.id.get}">Edit</a></li>
-                    <li><a href="/submit/@{post.get.id.get}">Submit</a></li>
+                    <li><a href="#" id="post-submit">Submit</a></li>
+                    <li><a href="#" id="post-delete">Delete</a></li>
                 } else {
                     <li><a href="/edit/@{post.get.id.get}">Edit</a></li>
                 }
@@ -73,10 +74,41 @@
 
 <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.js"))'></script>
 <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+<script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootbox.js"))'></script>
 <script type='text/javascript' src='@routes.Assets.at("javascripts/external/jquery.bootstrap-autohidingnavbar.min.js")'></script>
 
 <script>
 $("div.navbar-fixed-top").autoHidingNavbar();
+
+    $("#post-submit" ).click(function() {
+        @if(post.isDefined){
+        bootbox.confirm("Are you sure?", function(result) {
+            $.post("/post/@post.get.id.get", function( data ) {
+                window.location.href = "/";
+            });
+        });
+
+        }
+    });
+
+    $("#post-delete" ).click(function() {
+        @if(post.isDefined){
+
+    bootbox.confirm("Are you sure?", function(result) {
+                if (result){
+                $.ajax({
+                url: "/post/@post.get.id.get",
+                type: "DELETE",
+                success: function(data){
+                    window.location.href = "/drafts";
+                }
+                });
+            }
+            }
+    });
+
+
+    });
 </script>
 
 

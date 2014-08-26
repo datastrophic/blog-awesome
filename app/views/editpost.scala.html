@@ -1,4 +1,4 @@
-@(title: Option[String], body: Option[String])(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
+@(uid: Option[String], title: Option[String], body: Option[String])(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 @import auth.SocialUser
 
 <!DOCTYPE html>
@@ -74,7 +74,11 @@
                 };
 
                 $.ajax({
-                    url: "/post",
+                    @if(uid.isDefined) {
+                        url : "/post?uid=@uid.get",
+                    } else {
+                        url : "/post",
+                    }
                     type: "POST",
                     data: JSON.stringify(postData),
                     contentType: "application/json; charset=utf-8",

@@ -34,6 +34,7 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
   }
 
   def submit(uid: String) = UserAwareAction { implicit request =>
+    println(s"submit request for post with id: $uid")
     Await.result(PostDAO.get(uid), 5 seconds) map { post =>
       val newPost = post.copy(isDraft = false)
       PostDAO.update(newPost)
@@ -42,30 +43,33 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
   }
 
   def delete(uid: String) = UserAwareAction { implicit request =>
+    println(s"delete request for post with id: $uid")
     PostDAO.delete(uid)
     Redirect("/")
   }
 
   def drafts = TODO
 
-  def uploadPost = UserAwareAction(BodyParsers.parse.json) {
+  def uploadPost(oldUid: Option[String]) = UserAwareAction(BodyParsers.parse.json) {
     implicit request =>
 //      println(request.body)
 //      Post(id: String, title: String, preview: String, body: String, date: String, tags: List[String] = List(), comments: List[Comment] = List())
-
+      //TODO: check UID not exist [if exist add date to the end]
       val post = JsonTransformer.createPostFromJson(request.body)
 
-      if(post.isDefined){
-        //TODO: save post, get ID and redirect to preview
-        println(s"GOOD: ${post.get}")
+      post map {p =>
+        //TODO: generated uid: DD-MM-YYYY-post-title-name
+        val generatedUID = System.currentTimeMillis().toString
 
-        val uid = System.currentTimeMillis().toString
+        PostDAO.save(generatedUID, post.get.copy(id = Some(generatedUID)))
 
-        PostDAO.save(uid, post.get.copy(id = Some(uid)))
-
-        Ok(Json.obj("status" -> "OK", "pid" -> uid))
-      } else {
-        println(s"BAD")
+        p.id map {uid =>
+          if(uid != generatedUID){
+            PostDAO.delete(uid)
+          }
+        }
+        Ok(Json.obj("status" -> "OK", "pid" -> generatedUID))
+      } getOrElse {
         BadRequest(Json.obj("status" -> "KO", "message" -> "some errors with json structure"))
       }
   }
