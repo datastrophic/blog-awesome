@@ -1,0 +1,3 @@
+function (doc, meta) {
+    emit(doc.isDraft, doc);
+}

@@ -11,6 +11,7 @@ object DomainJsonFormats {
   implicit val dataBlockFormat = Json.format[DataBlock]
   implicit val postDTOFormat= Json.format[PostDTO]
   implicit val commentFormat= Json.format[Comment]
+  implicit val previewFormat= Json.format[Preview]
   implicit val postFormat = Json.format[Post]
 
 }

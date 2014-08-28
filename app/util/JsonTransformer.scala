@@ -76,7 +76,7 @@ object JsonTransformer {
     getStringValue(json, titleTransformer) flatMap {
       title =>
         extractBlocksFromPostJson(json) map {
-          blocks => Post(title = title, body = blocks, date = "today", tags = Nil, comments = Nil)
+          blocks => Post(title = title, body = blocks, date = None, tags = Nil, comments = Nil)
         }
     }
   }

@@ -15,7 +15,7 @@
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/eventable/eventable.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/sirtrevor/sir-trevor.min.js")'></script>
 
-        @navbar(user)(None)
+        @navbar(user)(None)(editMode = true)
             <!-- Page Content -->
         <div class="container">
             <div class="page-header" id="banner" style="padding-top: 60px;">
@@ -48,7 +48,7 @@
         <script>
             new SirTrevor.Editor({
                 el: $("#postBody"),
-                blockTypes: ["Text", "Image"]
+                blockTypes: ["Text", "Image", "Video"]
             });
 
             SirTrevor.setDefaults({
@@ -59,6 +59,10 @@
 
         <script>
         $(document).ready(function(){
+
+            $("#post-submit-button" ).click(function(){
+                $("form").submit();
+            });
 
             $("form").submit(function(e) {
                 e.preventDefault();
@@ -75,11 +79,12 @@
 
                 $.ajax({
                     @if(uid.isDefined) {
-                        url : "/post?uid=@uid.get",
+                        url : "/post/@uid.get",
+                        type: "PATCH",
                     } else {
                         url : "/post",
+                        type: "POST",
                     }
-                    type: "POST",
                     data: JSON.stringify(postData),
                     contentType: "application/json; charset=utf-8",
                     dataType: 'json',

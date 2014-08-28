@@ -1,4 +1,79 @@
-@(message: String)(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
-@import auth.SocialUser
+@(user: Option[auth.SocialUser])(previews: List[domain.Preview])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 
-@home(message)(user)
+@import auth.SocialUser
+@import domain.Preview
+
+<!DOCTYPE html>
+
+    <html>
+        @head()
+
+    <body>
+        @navbar(user)(None)(editMode = false)
+
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
+
+        <!-- Page Content -->
+    <div class="container">
+
+        <div class="page-header" id="banner">
+            <div class="row">
+                <div class="col-md-12">
+                    <h1>Blog! <small>Finally my awesome blog is here!</small></h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+                <!-- Blog Entries Column -->
+            <div class="col-md-12">
+                    @for(preview <- previews){
+                        <h2>
+                            <a href="/post/@preview.id">@preview.title</a>
+                        </h2>
+
+                        <p><span class="glyphicon glyphicon-time"></span> Posted on @preview.datePublished</p>
+                        <hr>
+                        @for(block <- preview.blocks){
+                            @{
+                                block.`type` match {
+                                    case "text" => {
+                                            <p class="md-content">{block.data}</p>
+                                    }
+                                    case "image" => {
+                                            <div style="text-align: center">
+                                            <p class="md-content">![]({block.data})</p>
+                                            </div>
+                                    }
+                                    case _ => {}
+                                }
+                            }
+                        }
+                        <a class="btn btn-primary" href="/post/@preview.id">continue <span class="glyphicon glyphicon-chevron-right"></span></a>
+                        <hr>
+                    }
+            </div>
+
+        </div>
+            <!-- /.row -->
+
+        <hr>
+
+        @footer()
+
+    </div>
+        <!-- /.container -->
+        <script>
+        $(document).ready(function(){
+
+                $( ".md-content" ).each(function( i ) {
+                    var $self = $(this);
+                    $self.replaceWith(markdown.toHTML($self.text()))
+                });
+
+         });
+        </script>
+    </body>
+
+</html>

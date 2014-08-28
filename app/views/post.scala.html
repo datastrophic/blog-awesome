@@ -9,7 +9,7 @@
     @head()
 
     <body>
-        @navbar(user)(Some(post))
+        @navbar(user)(Some(post))(editMode = false)
 
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
 
@@ -18,9 +18,9 @@
             <div class="page-header" id="banner">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
-                        <h3>@post.title</h3>
+                        <h2>@post.title</h2>
                             <!-- Date/Time -->
-                        <h6><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM</h6>
+                        <h6><span class="glyphicon glyphicon-time"></span> Posted on @post.date.get</h6>
                         <hr>
                     </div>
                 </div>
@@ -89,9 +89,13 @@
         </div>
         
         <script>
-            $( ".md-content" ).each(function( i ) {
+            $(document).ready(function() {
+
+                $(".md-content" ).each(function(i){
                 var $self = $(this);
-                $self.replaceWith(markdown.toHTML($self.text()))
+                    $self.replaceWith(markdown.toHTML($self.text()))
+                });
+
             });
         </script>
     </body>

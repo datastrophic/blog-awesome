@@ -1,4 +1,4 @@
-@(user: Option[auth.SocialUser])(post: Option[domain.Post] = None)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
+@(user: Option[auth.SocialUser])(post: Option[domain.Post] = None)(editMode: Boolean = false)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 
 @import domain.Post
 <!-- Navigation -->
@@ -13,47 +13,42 @@
     </div>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav">
-            @if(post.isDefined){
-                @*<li><a href="#">Blog</a></li>*@
-                @if(post.get.isDraft){
-                    <li><a href="/edit?uid=@{post.get.id.get}">Edit</a></li>
-                    <li><a href="#" id="post-submit">Submit</a></li>
-                    <li><a href="#" id="post-delete">Delete</a></li>
-                } else {
-                    <li><a href="/edit/@{post.get.id.get}">Edit</a></li>
-                }
-            }else{
-               @* <li class="active"><a href="#">Blog</a></li>*@
-                <li><a href="/edit">New Post</a></li>
-            }
 
-            @*<li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li class="divider"></li>
-                    <li class="dropdown-header">Dropdown header</li>
-                    <li><a href="#">Separated link</a></li>
-                    <li><a href="#">One more separated link</a></li>
-                </ul>
-            </li>*@
+            @if(!post.isDefined){
+                @if(editMode){
+                    <li><a href="#" id="post-submit-button">Submit</a></li>
+                } else {
+                    <li><a href="/edit">New Post</a></li>
+                }
+            } else {
+                @if(editMode){
+                    <li><a href="#" id="post-submit-button">Submit</a></li>
+                } else {
+                    @if(post.get.isDraft) {
+                        <li><a href="/edit?uid=@{post.get.id.get}">Edit</a></li>
+                        <li><a href="#" id="publish-post">Publish</a></li>
+                        <li><a href="#" id="post-delete">Delete</a></li>
+                    } else {
+                        <li><a href="/edit?uid=@{post.get.id.get}">Edit</a></li>
+                        <li><a href="#" id="post-delete">Delete</a></li>
+                    }
+                }
+            }
+            <li><a href="/drafts">Drafts</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><i class="fa fa-google-plus fa-lg"></i></a></li>
-            <li><a href="#"><i class="fa fa-twitter fa-lg"></i></a></li>
-            <li><a href="#"><i class="fa fa-linkedin fa-lg"></i></a></li>
-            <li><a href="#"><i class="fa fa-github fa-lg"></i></a></li>
+            <li><a href="https://plus.google.com/u/0/+AntonKirillov/posts/p/pub"><i class="fa fa-google-plus fa-lg"></i></a></li>
+            <li><a href="https://twitter.com/antonkirillov"><i class="fa fa-twitter fa-lg"></i></a></li>
+            <li><a href="https://www.linkedin.com/pub/anton-kirillov/27/387/79b"><i class="fa fa-linkedin fa-lg"></i></a></li>
+            <li><a href="https://github.com/akirillov"><i class="fa fa-github fa-lg"></i></a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b class="fa fa-gears fa-lg"></b></a>
                 <ul class="dropdown-menu">
                     @if(user.map(_.isAdmin).getOrElse(false)){
                         <li><a href="#">You R MASTER</a></li>
                     }
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
+
+                    <li><a href="#">Why Octopus?</a></li>
                     <li class="divider"></li>
 
                     @if(user.isDefined){
@@ -64,9 +59,14 @@
                 </ul>
             </li>
         </ul>
+        <div class="navbar-right"></div>
+        @*
+
+        SEARCH FORM
+
         <form class="navbar-form navbar-right">
             <input type="text" class="form-control col-lg-8" placeholder="Search">
-        </form>
+        </form>*@
     </div>
 </div>
 
@@ -78,37 +78,37 @@
 <script type='text/javascript' src='@routes.Assets.at("javascripts/external/jquery.bootstrap-autohidingnavbar.min.js")'></script>
 
 <script>
-$("div.navbar-fixed-top").autoHidingNavbar();
+        $("div.navbar-fixed-top").autoHidingNavbar();
 
-    $("#post-submit" ).click(function() {
-        @if(post.isDefined){
-        bootbox.confirm("Are you sure?", function(result) {
-            $.post("/post/@post.get.id.get", function( data ) {
-                window.location.href = "/";
-            });
-        });
+        $("#publish-post" ).click(function() {
 
-        }
-    });
-
-    $("#post-delete" ).click(function() {
-        @if(post.isDefined){
-
-    bootbox.confirm("Are you sure?", function(result) {
-                if (result){
-                $.ajax({
-                url: "/post/@post.get.id.get",
-                type: "DELETE",
-                success: function(data){
-                    window.location.href = "/drafts";
-                }
+            @if(post.isDefined){
+                bootbox.confirm("Are you sure?", function(result) {
+                    if ( result ) {
+                        $.post("/post/@post.get.id.get", function( data ) {
+                            window.location.href = "/";
+                        });
+                    }
                 });
             }
+        });
+
+        $("#post-delete" ).click(function() {
+            @if(post.isDefined) {
+
+                bootbox.confirm ( "Are you sure?", function ( result ) {
+                        if ( result ) {
+                            $.ajax ( {
+                                url : "/post/@post.get.id.get ",
+                                type : "DELETE",
+                                success : function ( data ) {
+                                   window.location.href = "/" ;
+                                }
+                            });
+                        }
+                });
             }
-    });
-
-
-    });
+        });
 </script>
 
 
