@@ -14,7 +14,7 @@ GET           /post/:uid            @controllers.Application.post(uid)
 POST          /post/:uid            @controllers.Application.submit(uid)
 DELETE        /post/:uid            @controllers.Application.delete(uid)
 GET           /edit                 @controllers.Application.editpost(uid: Option[String])
-POST          /post                 @controllers.Application.uploadPost
+POST          /post                 @controllers.Application.createPost
 PATCH         /post/:uid            @controllers.Application.updatePost(uid)
 GET           /drafts               @controllers.Application.drafts
 GET           /logout               @controllers.CustomLoginController.logout

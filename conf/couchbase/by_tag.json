@@ -1,7 +1,7 @@
 function (doc, meta) {
-    if (doc.tags) {
+    if (doc.tags && doc.date && !doc.isDraft) {
         for(var idx in doc.tags) {
-            emit(doc.tags[idx], null);
+            emit([doc.tags[idx], doc.date], null);
         }
     }
 }

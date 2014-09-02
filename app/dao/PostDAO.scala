@@ -6,7 +6,7 @@ import scala.concurrent.{Future, ExecutionContext, Await}
 import scala.concurrent.duration._
 import domain.DomainJsonFormats._
 import org.reactivecouchbase.client.OpResult
-import play.api.libs.json.{JsObject, Writes, Reads}
+import play.api.libs.json.{Json, JsObject, Writes, Reads}
 import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
 
 /**
@@ -14,20 +14,39 @@ import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
  */
 object PostDAO extends BaseDao[Post]{
 
+  /**
+   * Only published posts are shown, drafts are ignored (see by_tag couchbase view)
+   */
   def findPostsByTag(tag: String) = {
-    executeWithBucket(bucket =>
-      bucket.find[Post]("doc", "by_tag")(new Query().setIncludeDocs(true).setKey(tag).setStale(Stale.FALSE))
-    )
+    executeWithBucket(bucket => {
+
+      val query = new Query()
+        .setIncludeDocs(true)
+        .setRangeStart(ComplexKey.of(tag,"""{}"""))
+        .setRangeEnd(ComplexKey.of(tag).forceArray(true))
+        .setInclusiveEnd(true)
+        .setDescending(true)
+
+      bucket.find[Post]("doc", "by_tag")(query)
+    })
   }
 
   def findDrafts(): Future[List[Post]] = queryDraftsView(isDraft = true)
 
   def findSubmittedPosts(): Future[List[Post]] = queryDraftsView(isDraft = false)
 
-  private def queryDraftsView(isDraft: Boolean): Future[List[Post]] = {
-    executeWithBucket(bucket =>
-      bucket.find[Post]("doc", "by_draft")(new Query().setIncludeDocs(true).setKey(isDraft.toString).setStale(Stale.FALSE))
-    )
+  private def queryDraftsView(isDraft: java.lang.Boolean): Future[List[Post]] = {
+    executeWithBucket(bucket => {
+
+      val query = new Query()
+        .setIncludeDocs(true)
+        .setRangeStart(ComplexKey.of(isDraft, """{}"""))
+        .setRangeEnd(ComplexKey.of(isDraft).forceArray(true))
+        .setInclusiveEnd(true)
+        .setDescending(true)
+
+      bucket.find[Post]("doc", "by_draft")(query)
+    })
   }
 
   def exists(uid: String): Boolean = {

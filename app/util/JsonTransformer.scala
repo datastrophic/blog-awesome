@@ -80,7 +80,8 @@ object JsonTransformer {
         val extractedTags = extractTags(json).getOrElse(List())
 
         extractBlocksFromPostJson(json) map {
-          blocks => Post(title = title, body = blocks, date = None, tags = extractedTags, comments = Nil)
+              //TODO: fix date creation in outer blocks
+          blocks => Post(title = title, body = blocks, displayedDate = None, tags = extractedTags, comments = Nil, date = -1L)
         }
     }
   }

@@ -1,5 +1,6 @@
 package controllers
 
+import _root_.java.util.Date
 import securesocial.core._
 import play.api.mvc.{BodyParsers, RequestHeader}
 import auth.SocialUser
@@ -71,14 +72,15 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
     Ok(views.html.index(request.user)(previews))
   }
 
-  def uploadPost = UserAwareAction(BodyParsers.parse.json) {
+  def createPost = UserAwareAction(BodyParsers.parse.json) {
     implicit request =>
-      val post = JsonTransformer.createPostFromJson(request.body)
+      val newPost = JsonTransformer.createPostFromJson(request.body)
 
-      post map {p =>
+      newPost map {p =>
         val generatedUID = StringAndDateUtils.generateUID(p.title)
+        val dateAsMillis = new Date().getTime
 
-        PostDAO.save(generatedUID, post.get.copy(id = Some(generatedUID), isDraft = true, date = StringAndDateUtils.getCurrentDateAsString))
+        PostDAO.save(generatedUID, newPost.get.copy(id = Some(generatedUID), isDraft = true, displayedDate = StringAndDateUtils.getCurrentDateAsString, date = dateAsMillis))
 
         Ok(Json.obj("status" -> "OK", "pid" -> generatedUID))
       } getOrElse {
@@ -89,19 +91,25 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
   def updatePost(uid: String) = UserAwareAction(BodyParsers.parse.json) {
     implicit request =>
 
-      val post = JsonTransformer.createPostFromJson(request.body)
+      val newPost = JsonTransformer.createPostFromJson(request.body)
 
-      post map {p =>
+      newPost map {p =>
         val generatedUID = StringAndDateUtils.generateUID(p.title)
 
-        PostDAO.save(generatedUID, post.get.copy(id = Some(generatedUID), date = StringAndDateUtils.getCurrentDateAsString))
-        println(s"in updatePost => uid: $uid\npost: $post")
+        Await.result(PostDAO.get(uid.trim), 5 seconds) map { savedPost =>
+          PostDAO.save(generatedUID, newPost.get.copy(id = Some(generatedUID), displayedDate = savedPost.displayedDate, date = savedPost.date))
+          println(s"in updatePost => uid: $uid\npost: $newPost")
 
-        if(uid != generatedUID){
+          if(uid != generatedUID){
             PostDAO.delete(uid)
           }
+          Ok(Json.obj("status" -> "OK", "pid" -> generatedUID))
+        } getOrElse {
+          BadRequest(Json.obj("status" -> "KO", "message" -> s"post with uid $uid not found in database"))
+        }
 
-        Ok(Json.obj("status" -> "OK", "pid" -> generatedUID))
+
+
       } getOrElse {
         BadRequest(Json.obj("status" -> "KO", "message" -> "some errors with json structure"))
       }
