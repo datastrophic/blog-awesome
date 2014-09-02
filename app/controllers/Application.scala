@@ -7,10 +7,11 @@ import play.api.libs.json.{JsValue, JsError, Json}
 import domain.{Preview, Post, PostDTO}
 import domain.DomainJsonFormats._
 import util.{StringAndDateUtils, JsonTransformer}
-import dao.PostDAO
+import dao.{TagDao, PostDAO}
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import play.mvc.Result
+import scala.util.Random
 
 class Application(override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {
 
@@ -24,9 +25,13 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
     uid map { uid =>
       Await.result(PostDAO.get(uid), 5 seconds) map { post =>
 
-        Ok(views.html.editpost(post.id, Some(post.title), Some(JsonTransformer.buildSirTrevorBlocks(post).toString()))(request.user))
+        val tags = if(post.tags.isEmpty) None else Some(Json.toJson(post.tags).toString)
+
+        println(tags)
+
+        Ok(views.html.editpost(post.id, Some(post.title), Some(JsonTransformer.buildSirTrevorBlocks(post).toString()), tags)(request.user))
       } getOrElse(BadRequest(s"Post with uid $uid not found!"))
-    } getOrElse Ok(views.html.editpost(None, None, None)(request.user))
+    } getOrElse Ok(views.html.editpost(None, None, None, None)(request.user))
   }
 
   def post(uid: String) = UserAwareAction { implicit request =>
@@ -41,6 +46,9 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
     Await.result(PostDAO.get(uid.trim), 5 seconds) map { post =>
       val newPost = post.copy(isDraft = false)
       PostDAO.save(uid, newPost)
+
+      TagDao.mergeTags(post.tags)//! happens only when post submitted to minimize amount of trash tags
+
       Redirect("/")
     } getOrElse(BadRequest(s"Draft with uid $uid does not exist!"))
   }
@@ -80,9 +88,10 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
       post map {p =>
         val generatedUID = StringAndDateUtils.generateUID(p.title)
 
-        PostDAO.save(generatedUID, post.get.copy(id = Some(generatedUID)))
+        PostDAO.save(generatedUID, post.get.copy(id = Some(generatedUID), date = StringAndDateUtils.getCurrentDateAsString))
+        println(s"in updatePost => uid: $uid\npost: $post")
 
-          if(uid != generatedUID){
+        if(uid != generatedUID){
             PostDAO.delete(uid)
           }
 

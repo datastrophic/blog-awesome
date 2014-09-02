@@ -32,7 +32,11 @@
                         <h2>
                             <a href="/post/@preview.id">@preview.title</a>
                         </h2>
-
+                        <p>
+                            @for(tag <- preview.tags){
+                                <a href="/postbytag/@tag" class="label label-default">@tag</a>
+                            }
+                        </p>
                         <p><span class="glyphicon glyphicon-time"></span> Posted on @preview.datePublished</p>
                         <hr>
                         @for(block <- preview.blocks){

@@ -34,6 +34,7 @@ object JsonTransformer {
   */
 
   private val arrayTransformer = (__ \ 'data).json.pick[JsArray]
+  private val tagsTransformer = (__ \ 'tags).json.pick[JsArray]
   private val titleTransformer = (__ \ 'title).json.pick[JsString]
   private val typeTransformer = (__ \ 'type).json.pick[JsString]
   private val textTransformer = (__ \ 'data \ 'text).json.pick[JsString]
@@ -75,12 +76,23 @@ object JsonTransformer {
   def createPostFromJson(json: JsValue): Option[Post] = {
     getStringValue(json, titleTransformer) flatMap {
       title =>
+
+        val extractedTags = extractTags(json).getOrElse(List())
+
         extractBlocksFromPostJson(json) map {
-          blocks => Post(title = title, body = blocks, date = None, tags = Nil, comments = Nil)
+          blocks => Post(title = title, body = blocks, date = None, tags = extractedTags, comments = Nil)
         }
     }
   }
 
+  def extractTags(json: JsValue): Option[List[String]] = {
+    json.transform(tagsTransformer) match {
+      case s: JsSuccess[JsArray] =>
+        val arr = s.get
+        Some(arr.value.map(v => v.as[String]).toList)
+      case error: JsError => None
+    }
+  }
 
   def extractBlocksFromPostJson(json: JsValue): Option[List[DataBlock]] = {
     json.transform(arrayTransformer) match {
@@ -112,8 +124,8 @@ object JsonTransformer {
 
 
   def main(args: Array[String]): Unit = {
-    val sample = Json.parse("{\"title\":\"test\",\"data\":[{\"type\":\"text\",\"data\":{\"text\":\"any\"}},{\"type\":\"image\",\"data\":{\"file\":{\"url\":\"werwerwer\"}}}]}")
+    val sample = Json.parse("{\"title\":\"test\",\"data\":[{\"type\":\"text\",\"data\":{\"text\":\"any\"}},{\"type\":\"image\",\"data\":{\"file\":{\"url\":\"werwerwer\"}}}], \"tags\":[\"one\", \"two\"]}")
 
-    extractBlocksFromPostJson(sample) foreach println
+    extractTags(sample) foreach println
   }
 }

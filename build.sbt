@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
     // WebJars (i.e. client-side) dependencies
     "org.webjars" %% "webjars-play" % "2.3.0",
     "org.webjars" % "requirejs" % "2.1.14-1",
-    "org.webjars" % "underscorejs" % "1.6.0-3",
+    "org.webjars" % "underscorejs" % "1.6.0-3" exclude("org.webjars", "jquery"),
     "org.webjars" % "jquery" % "2.1.1",
     "org.webjars" % "html5shiv" % "3.7.2",
     "org.webjars" % "respond" % "1.4.2",

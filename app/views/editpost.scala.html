@@ -1,7 +1,10 @@
-@(uid: Option[String], title: Option[String], body: Option[String])(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
+@(uid: Option[String], title: Option[String], body: Option[String], tags: Option[String])(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 @import auth.SocialUser
+@import play.api.libs.json._
+@import play.api.libs.json
 
-<!DOCTYPE html>
+
+    <!DOCTYPE html>
 
 <html>
     @head()
@@ -9,11 +12,11 @@
     <body>
         <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/sirtrevor/sir-trevor.css")'>
         <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/sirtrevor/sir-trevor-icons.css")'>
-        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
-        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.js"))'></script>
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("underscore.js"))'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/eventable/eventable.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/sirtrevor/sir-trevor.min.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/bootstrap-tags/bootstrap-tags.js")'></script>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/bootstrap-tags/bootstrap-tags.css")'>
 
         @navbar(user)(None)(editMode = true)
             <!-- Page Content -->
@@ -27,6 +30,9 @@
                             <input id="postTitle" type="text" class="form-control input-lg" placeholder="Post Title">
                         }
                         <hr>
+                    </div>
+                    <div class="col-md-10 col-md-offset-1 bootstrap-tags" style="padding-top: 4px;">
+                        <div id="tag-list"></div>
                     </div>
                 </div>
             </div>
@@ -69,34 +75,47 @@
                 sendPostToServer();
             });
 
-        });
+            var postTags;
 
-        function sendPostToServer() {
+            @if(tags.isDefined){
+                postTags = @{play.twirl.api.Html(tags.get)};
+            }
+
+            var tagsObject;
+
+            //tag list population
+            $.getJSON( "/taglist", function( data ) {
+                tagsObject = $('#tag-list').tags({
+                    tagData: postTags,
+                    suggestions: data
+                  });
+            });
+
+            function sendPostToServer() {
                 var postData = {
                     title : $ ( "#postTitle" ).val ( ),
-                    data: jQuery.parseJSON($("#postBody").val())['data']
+                    data: jQuery.parseJSON($("#postBody").val())['data'],
+                    tags: tagsObject.getTags()
                 };
 
                 $.ajax({
-                    @if(uid.isDefined) {
-                        url : "/post/@uid.get",
-                        type: "PATCH",
-                    } else {
-                        url : "/post",
-                        type: "POST",
-                    }
-                    data: JSON.stringify(postData),
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
-                    success: function(data){
-                        window.location.href = "/post/"+data['pid'];
-                    }
-                })
-        }
-
-
+                        @if(uid.isDefined) {
+                            url : "/post/@uid.get",
+                            type: "PATCH",
+                        } else {
+                            url : "/post",
+                            type: "POST",
+                        }
+                        data: JSON.stringify(postData),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function(data){
+                            window.location.href = "/post/"+data['pid'];
+                        }
+                    });
+                }
+        });
         </script>
-
     </body>
 
 </html>
