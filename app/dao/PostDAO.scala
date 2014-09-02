@@ -14,6 +14,12 @@ import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
  */
 object PostDAO extends BaseDao[Post]{
 
+  def findPostsByTag(tag: String) = {
+    executeWithBucket(bucket =>
+      bucket.find[Post]("doc", "by_tag")(new Query().setIncludeDocs(true).setKey(tag).setStale(Stale.FALSE))
+    )
+  }
+
   def findDrafts(): Future[List[Post]] = queryDraftsView(isDraft = true)
 
   def findSubmittedPosts(): Future[List[Post]] = queryDraftsView(isDraft = false)

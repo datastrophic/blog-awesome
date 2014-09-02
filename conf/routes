@@ -9,6 +9,7 @@ GET           /webjars/*file        controllers.WebJarAssets.at(file)
 
 # Home page
 GET           /                     @controllers.Application.index
+GET           /post/tag/:tag       @controllers.Application.postsByTag(tag)
 GET           /post/:uid            @controllers.Application.post(uid)
 POST          /post/:uid            @controllers.Application.submit(uid)
 DELETE        /post/:uid            @controllers.Application.delete(uid)

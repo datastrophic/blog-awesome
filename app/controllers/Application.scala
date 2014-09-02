@@ -65,6 +65,12 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
     Ok(views.html.index(request.user)(previews))
   }
 
+  def postsByTag(tag: String) = UserAwareAction { implicit request =>
+    val previews = Await.result(PostDAO.findPostsByTag(tag), 5 seconds) map {post => Preview.fromPost(post)}
+
+    Ok(views.html.index(request.user)(previews))
+  }
+
   def uploadPost = UserAwareAction(BodyParsers.parse.json) {
     implicit request =>
       val post = JsonTransformer.createPostFromJson(request.body)
