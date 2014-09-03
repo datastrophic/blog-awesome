@@ -1,6 +1,6 @@
 package dao
 
-import domain.Post
+import domain.{PostPage, Post}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, ExecutionContext, Await}
 import scala.concurrent.duration._
@@ -17,7 +17,7 @@ object PostDAO extends BaseDao[Post]{
   /**
    * Only published posts are shown, drafts are ignored (see by_tag couchbase view)
    */
-  def findPostsByTag(tag: String) = {
+  def findPostsByTag(tag: String, pageNum: Int) = {
     executeWithBucket(bucket => {
 
       val query = new Query()
@@ -26,16 +26,18 @@ object PostDAO extends BaseDao[Post]{
         .setRangeEnd(ComplexKey.of(tag).forceArray(true))
         .setInclusiveEnd(true)
         .setDescending(true)
+        .setLimit(PostPage.PageSize + 1)
+        .setSkip(PostPage.PageSize * (pageNum-1))
 
       bucket.find[Post]("doc", "by_tag")(query)
     })
   }
 
-  def findDrafts(): Future[List[Post]] = queryDraftsView(isDraft = true)
+  def findDrafts(pageNum: Int): Future[List[Post]] = queryDraftsView(isDraft = true, pageNum)
 
-  def findSubmittedPosts(): Future[List[Post]] = queryDraftsView(isDraft = false)
+  def findSubmittedPosts(pageNum: Int): Future[List[Post]] = queryDraftsView(isDraft = false, pageNum)
 
-  private def queryDraftsView(isDraft: java.lang.Boolean): Future[List[Post]] = {
+  private def queryDraftsView(isDraft: java.lang.Boolean, pageNum: Int): Future[List[Post]] = {
     executeWithBucket(bucket => {
 
       val query = new Query()
@@ -44,6 +46,8 @@ object PostDAO extends BaseDao[Post]{
         .setRangeEnd(ComplexKey.of(isDraft).forceArray(true))
         .setInclusiveEnd(true)
         .setDescending(true)
+        .setLimit(PostPage.PageSize + 1)
+        .setSkip(PostPage.PageSize * (pageNum-1))
 
       bucket.find[Post]("doc", "by_draft")(query)
     })

@@ -1,7 +1,8 @@
-@(user: Option[auth.SocialUser])(previews: List[domain.Preview])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
+@(user: Option[auth.SocialUser])(previews: List[domain.Preview], page: domain.PostPage)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 
 @import auth.SocialUser
 @import domain.Preview
+@import domain.PostPage
 
 <!DOCTYPE html>
 
@@ -57,6 +58,18 @@
                         <a class="btn btn-primary" href="/post/@preview.id">continue <span class="glyphicon glyphicon-chevron-right"></span></a>
                         <hr>
                     }
+
+                @if(page.next.isDefined || page.previous.isDefined){
+                    <ul class="pager">
+                        @page.previous.map { newer =>
+                            <li class="previous pull-left"><a href="@newer">← Newer</a></li>
+                        }
+                        @page.next.map { older =>
+                            <li class="next pull-right"><a href="@older">Older →</a></li>
+                        }
+                    </ul>
+                }
+
             </div>
 
         </div>

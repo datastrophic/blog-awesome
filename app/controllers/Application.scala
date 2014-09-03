@@ -5,7 +5,7 @@ import securesocial.core._
 import play.api.mvc.{BodyParsers, RequestHeader}
 import auth.SocialUser
 import play.api.libs.json.{JsValue, JsError, Json}
-import domain.{Preview, Post, PostDTO}
+import domain.{PostPage, Preview, Post, PostDTO}
 import domain.DomainJsonFormats._
 import util.{StringAndDateUtils, JsonTransformer}
 import dao.{TagDao, PostDAO}
@@ -16,10 +16,12 @@ import scala.util.Random
 
 class Application(override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {
 
-  def index = UserAwareAction { implicit request =>
-    val previews = Await.result(PostDAO.findSubmittedPosts(), 5 seconds) map {post => Preview.fromPost(post)}
+  def index(page: Option[Int]) = UserAwareAction { implicit request =>
+    val previews = Await.result(PostDAO.findSubmittedPosts(page.getOrElse(1)), 5 seconds) map {post => Preview.fromPost(post)}
 
-    Ok(views.html.index(request.user)(previews))
+    val postPage = createPage("/", previews, page)
+
+    Ok(views.html.index(request.user)(previews.take(PostPage.PageSize), postPage))
   }
 
   def editpost(uid: Option[String]) = UserAwareAction { implicit request =>
@@ -60,16 +62,40 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
     Ok("post deleted")
   }
 
-  def drafts = UserAwareAction { implicit request =>
-    val previews = Await.result(PostDAO.findDrafts(), 5 seconds) map {post => Preview.fromPost(post)}
+  def drafts(page: Option[Int]) = UserAwareAction { implicit request =>
+    val previews = Await.result(PostDAO.findDrafts(page.getOrElse(1)), 5 seconds) map {post => Preview.fromPost(post)}
 
-    Ok(views.html.index(request.user)(previews))
+    val postPage = createPage("/drafts", previews, page)
+
+    Ok(views.html.index(request.user)(previews.take(PostPage.PageSize), postPage))
   }
 
-  def postsByTag(tag: String) = UserAwareAction { implicit request =>
-    val previews = Await.result(PostDAO.findPostsByTag(tag), 5 seconds) map {post => Preview.fromPost(post)}
+  def postsByTag(tag: String, page: Option[Int]) = UserAwareAction { implicit request =>
+    val previews = Await.result(PostDAO.findPostsByTag(tag, page.getOrElse(1)), 5 seconds) map {post => Preview.fromPost(post)}
 
-    Ok(views.html.index(request.user)(previews))
+    val postPage = createPage(s"/post/tag/$tag", previews, page)
+
+    Ok(views.html.index(request.user)(previews.take(PostPage.PageSize), postPage))
+  }
+  
+  
+  private def createPage(source: String, previews: List[Preview], pageNum: Option[Int]) = {
+
+    (pageNum, previews.size <= PostPage.PageSize) match {
+      //in the middle
+      case (Some(page: Int), true) =>
+        val prev = if(page == 2) "" else s"?page=${page-1}"
+        PostPage(previous = Some(source + prev), next = None)
+
+      //last page
+      case (Some(page: Int), false) =>
+        val prev = if(page == 2) "" else s"?page=${page-1}"
+        PostPage(previous = Some(source + prev), next = Some(source+s"?page=${page+1}"))
+      //no posts around
+      case (None, true) => PostPage(previous = None, next = None)
+      //first page
+      case (None, false) => PostPage(previous = None, next = Some(source+s"?page=2"))
+    }
   }
 
   def createPost = UserAwareAction(BodyParsers.parse.json) {

@@ -8,15 +8,15 @@ GET           /assets/*file         controllers.Assets.at(path="/public", file)
 GET           /webjars/*file        controllers.WebJarAssets.at(file)
 
 # Home page
-GET           /                     @controllers.Application.index
-GET           /post/tag/:tag       @controllers.Application.postsByTag(tag)
+GET           /                     @controllers.Application.index(page: Option[Int])
+GET           /post/tag/:tag        @controllers.Application.postsByTag(tag, page: Option[Int])
 GET           /post/:uid            @controllers.Application.post(uid)
 POST          /post/:uid            @controllers.Application.submit(uid)
 DELETE        /post/:uid            @controllers.Application.delete(uid)
 GET           /edit                 @controllers.Application.editpost(uid: Option[String])
 POST          /post                 @controllers.Application.createPost
 PATCH         /post/:uid            @controllers.Application.updatePost(uid)
-GET           /drafts               @controllers.Application.drafts
+GET           /drafts               @controllers.Application.drafts(page: Option[Int])
 GET           /logout               @controllers.CustomLoginController.logout
 
 POST          /image                @controllers.ImageController.uploadImage
