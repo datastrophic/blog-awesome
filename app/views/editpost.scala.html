@@ -31,8 +31,8 @@
                         }
                         <hr>
                     </div>
-                    <div class="col-md-10 col-md-offset-1 bootstrap-tags" style="padding-top: 4px;">
-                        <div id="tag-list"></div>
+                    <div class="col-md-10 col-md-offset-1">
+                        <div id="tag-list" class="tag-list"></div>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
             $.getJSON( "/taglist", function( data ) {
                 tagsObject = $('#tag-list').tags({
                     tagData: postTags,
-                    suggestions: data
+                    suggestions: data,
                   });
             });
 

@@ -14,3 +14,8 @@ h6,
     font-family: 'Lato','Helvetica Neue','Source Sans Pro',Helvetica,Arial, sans-serif !important;
 }
 p {font-size: large}
+
+.bootstrap-tags .tags {
+    padding-left: 4px !important;
+    padding-top: 4px !important;
+}
