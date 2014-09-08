@@ -39,6 +39,7 @@ object JsonTransformer {
   private val typeTransformer = (__ \ 'type).json.pick[JsString]
   private val textTransformer = (__ \ 'data \ 'text).json.pick[JsString]
   private val imageTransformer = (__ \ 'data \ 'file \ 'url).json.pick[JsString]
+  private val gistTransformer = (__ \ 'data \ 'id).json.pick[JsString]
 
   def buildSirTrevorBlocks(post: Post): JsValue =
     Json.obj(
@@ -49,6 +50,7 @@ object JsonTransformer {
     dataBlock.`type` match {
       case "text" => createTextBlock(dataBlock)
       case "image" => createImageBlock(dataBlock)
+      case "gist" => createGistBlock(dataBlock)
       case _ => Json.obj()
     }
   }
@@ -73,6 +75,15 @@ object JsonTransformer {
     )
   }
 
+  private def createGistBlock(dataBlock: DataBlock): JsValue = {
+    Json.obj(
+      "type" -> "gist",
+      "data" -> Json.obj(
+        "id" -> dataBlock.data
+      )
+    )
+  }
+
   def createPostFromJson(json: JsValue): Option[Post] = {
     getStringValue(json, titleTransformer) flatMap {
       title =>
@@ -80,7 +91,7 @@ object JsonTransformer {
         val extractedTags = extractTags(json).getOrElse(List())
 
         extractBlocksFromPostJson(json) map {
-              //TODO: fix date creation in outer blocks
+              //TODO: fix date creation in outer blocks of code
           blocks => Post(title = title, body = blocks, displayedDate = None, tags = extractedTags, comments = Nil, date = -1L)
         }
     }
@@ -108,6 +119,7 @@ object JsonTransformer {
     getType(jsValue) flatMap {
       case "text" => getText(jsValue) flatMap (text => Some(DataBlock("text", text)))
       case "image" => getImage(jsValue) flatMap (url => Some(DataBlock("image", url)))
+      case "gist" => getGist(jsValue) flatMap (gistId => Some(DataBlock("gist", gistId)))
       case _ => None
     }
   }
@@ -122,6 +134,7 @@ object JsonTransformer {
   private def getImage(jsValue: JsValue): Option[String] = getStringValue(jsValue, imageTransformer)
   private def getText(jsValue: JsValue): Option[String] = getStringValue(jsValue, textTransformer)
   private def getType(jsValue: JsValue): Option[String] = getStringValue(jsValue, typeTransformer)
+  private def getGist(jsValue: JsValue): Option[String] = getStringValue(jsValue, gistTransformer)
 
 
   def main(args: Array[String]): Unit = {

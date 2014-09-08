@@ -100,6 +100,7 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
 
   def createPost = UserAwareAction(BodyParsers.parse.json) {
     implicit request =>
+      println(request.body)
       val newPost = JsonTransformer.createPostFromJson(request.body)
 
       newPost map {p =>

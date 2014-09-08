@@ -14,7 +14,7 @@
         <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/sirtrevor/sir-trevor-icons.css")'>
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("underscore.js"))'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/eventable/eventable.js")'></script>
-        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/sirtrevor/sir-trevor.min.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/sirtrevor/sir-trevor.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/bootstrap-tags/bootstrap-tags.js")'></script>
         <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/bootstrap-tags/bootstrap-tags.css")'>
 
@@ -54,7 +54,7 @@
         <script>
             new SirTrevor.Editor({
                 el: $("#postBody"),
-                blockTypes: ["Text", "Image", "Video"]
+                blockTypes: ["Text", "Gist","Image", "Video"]
             });
 
             SirTrevor.setDefaults({

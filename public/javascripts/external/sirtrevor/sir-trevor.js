@@ -1948,6 +1948,105 @@
       }
     }
   });
+
+    /*
+        Code block
+     */
+
+    SirTrevor.Blocks.Code = SirTrevor.Block.extend({
+
+        type: "code",
+
+        title: function() { return 'Code'; },
+
+        editorHTML: '<pre class="st-required st-text-block" style="text-align: left; font-size: 0.75em;" contenteditable="true"></pre><input type=text class="st-input-string js-caption-input" name=caption placeholder="Caption" style="width: 100%; margin-top: 10px; text-align: center">',
+
+        icon_name: 'quote',
+
+        loadData: function(data){
+            this.getTextBlock().html(SirTrevor.toHTML(data.text, this.type));
+        }
+    });
+
+
+    /*
+     Gist block
+    */
+
+    SirTrevor.Blocks.Gist = (function(){
+
+        return SirTrevor.Block.extend({
+
+            type: "Gist",
+            droppable: true,
+            pastable: true,
+            fetchable: true,
+
+            loadData: function(data) {
+                this.loadRemoteGist(data.id);
+            },
+
+            onContentPasted: function(event){
+                // Content pasted. Delegate to the drop parse method
+                var input = $(event.target),
+                    val = input.val();
+
+                this.handleGistDropPaste(val);
+            },
+
+            handleGistDropPaste: function(url) {
+                if (!this.validGistUrl(url)) {
+                    this.addMessage("Invalid Gist URL");
+                    return;
+                }
+
+                var gistID = url.match(/[^\/]+$/);
+                if (!_.isEmpty(gistID)) {
+                    gistID = gistID[0];
+                    this.loading();
+                    this.setData({ id: gistID });
+                    this.loadRemoteGist(gistID);
+                }
+            },
+
+            validGistUrl: function(url) {
+                return (_.isURI(url) &&
+                    url.indexOf("gist.github") !== -1);
+            },
+
+            onDrop: function(transferData){
+                var url = transferData.getData('text/plain');
+                this.handleGistDropPaste(url);
+            },
+
+            loadRemoteGist: function(gistID) {
+                var ajaxOptions = {
+                    url: "https://gist.github.com/" + gistID + ".json",
+                    dataType: "jsonp"
+                };
+
+                this.fetch(ajaxOptions, this.onGistFetchSuccess, this.onGistFetchFail);
+            },
+
+            onGistFetchSuccess: function(data) {
+                // And render
+                $('head').append('<link rel="stylesheet" href="'+data.stylesheet+'" type="text/css">');
+
+                this.$inputs.hide();
+                this.$editor.html(data.div).show();
+                this.ready();
+            },
+
+            onGistFetchFail: function() {
+                this.addMessage("There was a problem fetching your Gist");
+                this.ready();
+            }
+
+        });
+
+    })();
+
+
   /*
     Text Block
   */
@@ -2072,6 +2171,7 @@
   /*
     Unordered List
   */
+
   
   SirTrevor.Blocks.List = (function() {
   

@@ -12,6 +12,8 @@
         @navbar(user)(Some(post))(editMode = false)
 
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/gist-embed/gist-embed.js")'></script>
+
 
         <!-- Page Content -->
         <div class="container">
@@ -36,18 +38,18 @@
                     <!-- Blog Post Content Column -->
                 <div class="col-md-10 col-md-offset-1">
                     @for(block <- post.body){
-                        @{
-                            block.`type` match {
-                             case "text" => {
-                                    <p class="md-content">{block.data}</p>
-                            }
-                             case "image" => {
-                                 <div style="text-align: center">
-                                    <p class="md-content">![]({block.data})</p>
-                                 </div>
-                            }
-                             case _ => {}
-                            }
+                        @if(block.`type` == "text") {
+                            <p class="md-content">@{block.data}</p>
+                        } 
+
+                        @if(block.`type` == "gist") {
+                            <code data-gist-id="@{block.data}"></code>
+                        }
+
+                        @if(block.`type` == "image") {
+                            <div style="text-align: center">
+                                <p class="md-content">![]({block.data})</p>
+                            </div>
                         }
                     }
                     <hr>
