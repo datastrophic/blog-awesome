@@ -6,5 +6,5 @@ package domain
 case class PostPage(previous: Option[String] = None, next: Option[String] = None)
 
 object PostPage{
-  val PageSize = 2
+  val PageSize = 10
 }

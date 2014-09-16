@@ -60,6 +60,9 @@
             </li>
         </ul>
         <div class="navbar-right"></div>
+            @if(user.isDefined){
+                <img height="40px" width="40px" src="@user.get.profile.avatarUrl.get" class="img-circle navbar-right" style="margin-top: 10px; margin-right: 10px;">
+            }
         @*
 
         SEARCH FORM

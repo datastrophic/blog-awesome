@@ -11,7 +11,7 @@ GET           /webjars/*file        controllers.WebJarAssets.at(file)
 GET           /                     @controllers.Application.index(page: Option[Int])
 GET           /post/tag/:tag        @controllers.Application.postsByTag(tag, page: Option[Int])
 GET           /post/:uid            @controllers.Application.post(uid)
-POST          /post/:uid            @controllers.Application.submit(uid)
+POST          /post/:uid            @controllers.Application.publishPost(uid)
 DELETE        /post/:uid            @controllers.Application.delete(uid)
 GET           /edit                 @controllers.Application.editpost(uid: Option[String])
 POST          /post                 @controllers.Application.createPost

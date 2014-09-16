@@ -44,11 +44,13 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
       } getOrElse(Redirect("/"))
   }
 
-  def submit(uid: String) = UserAwareAction { implicit request =>
+  def publishPost(uid: String) = UserAwareAction { implicit request =>
     println(s"submit request for post with id: $uid")
     Await.result(PostDAO.get(uid.trim), 5 seconds) map { post =>
       val newPost = post.copy(isDraft = false)
-      PostDAO.save(uid, newPost)
+
+      //have to wait to display newly published post in feed
+      Await.result(PostDAO.save(uid, newPost), 5 seconds)
 
       TagDao.mergeTags(post.tags)//! happens only when post submitted to minimize amount of trash tags
 
