@@ -1,4 +1,4 @@
-import controllers.Application
+import controllers.PostController
 import play.api.mvc.Results
 import play.api.test._
 import play.api.test.Helpers._
@@ -8,7 +8,7 @@ class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
 
   "Example Page#index" should {
     "should be valid" in {
-      val controller = Global.getControllerInstance(classOf[Application])
+      val controller = Global.getControllerInstance(classOf[PostController])
       val result = controller.index(None).apply(FakeRequest())
 
       val bodyText: String = contentAsString(result)

@@ -1,6 +1,6 @@
 package dao
 
-import domain.{PostPage, Post}
+import domain.{ViewPage, Post}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, ExecutionContext, Await}
 import scala.concurrent.duration._
@@ -26,8 +26,8 @@ object PostDAO extends BaseDao[Post]{
         .setRangeEnd(ComplexKey.of(tag).forceArray(true))
         .setInclusiveEnd(true)
         .setDescending(true)
-        .setLimit(PostPage.PageSize)
-        .setSkip(PostPage.PageSize * (pageNum-1))
+        .setLimit(ViewPage.PageSize)
+        .setSkip(ViewPage.PageSize * (pageNum-1))
         .setStale(Stale.FALSE)
 
         bucket.find[Post]("doc", "by_tag")(query)
@@ -47,8 +47,8 @@ object PostDAO extends BaseDao[Post]{
         .setRangeEnd(ComplexKey.of(isDraft).forceArray(true))
         .setInclusiveEnd(true)
         .setDescending(true)
-        .setLimit(PostPage.PageSize)
-        .setSkip(PostPage.PageSize * (pageNum-1))
+        .setLimit(ViewPage.PageSize)
+        .setSkip(ViewPage.PageSize * (pageNum-1))
         .setStale(Stale.FALSE)
 
       bucket.find[Post]("doc", "by_draft")(query)

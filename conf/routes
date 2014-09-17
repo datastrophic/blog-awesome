@@ -8,15 +8,15 @@ GET           /assets/*file         controllers.Assets.at(path="/public", file)
 GET           /webjars/*file        controllers.WebJarAssets.at(file)
 
 # Home page
-GET           /                     @controllers.Application.index(page: Option[Int])
-GET           /post/tag/:tag        @controllers.Application.postsByTag(tag, page: Option[Int])
-GET           /post/:uid            @controllers.Application.post(uid)
-POST          /post/:uid            @controllers.Application.publishPost(uid)
-DELETE        /post/:uid            @controllers.Application.delete(uid)
-GET           /edit                 @controllers.Application.editpost(uid: Option[String])
-POST          /post                 @controllers.Application.createPost
-PATCH         /post/:uid            @controllers.Application.updatePost(uid)
-GET           /drafts               @controllers.Application.drafts(page: Option[Int])
+GET           /                     @controllers.PostController.index(page: Option[Int])
+GET           /post/tag/:tag        @controllers.PostController.getPostsByTag(tag, page: Option[Int])
+GET           /post/:uid            @controllers.PostController.postViewPage(uid)
+POST          /post/:uid            @controllers.PostController.publishPost(uid)
+DELETE        /post/:uid            @controllers.PostController.deletePost(uid)
+GET           /edit                 @controllers.PostController.postEditPage(uid: Option[String])
+POST          /post                 @controllers.PostController.createPost
+PATCH         /post/:uid            @controllers.PostController.updatePost(uid)
+GET           /drafts               @controllers.PostController.getDraftsPage(page: Option[Int])
 GET           /logout               @controllers.CustomLoginController.logout
 
 POST          /image                @controllers.ImageController.uploadImage

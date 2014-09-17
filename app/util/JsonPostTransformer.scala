@@ -2,36 +2,22 @@ package util
 
 import domain.{Post, DataBlock}
 import play.api.libs.json._
-import play.api.libs.json
 
 /**
- * Created by akirillov on 8/21/14.
+ * Idea behind post storage:
+ *
+ * As Sir Trevor internal representation is Markdown-like, it seems reasonable to store blocks separately
+ * specifying type and raw content.
+ *
+ * For representation in view mode each block data is modified to valid markdown syntax (depending on block type).
+ * After that markdown.js is used for appropriate representation.
+ *
+ * When the data is passed back to Sir Trevor for editing, block data is transformed to be correctly understood by
+ * editor.
+ *
+ * The bottom line is that data stored in raw markdown format and when used is slightly modified for proper displaying.
  */
-object JsonTransformer {
-
-  /**
-   * Idea: as Sir Trevor can't be used in read-only mode (?) the next outcomes arise:
-   * 1. Sir Trevor has it's own representation of data
-   * 2. Post view form will use markdown parser and Sir Trevors format is incompatible with it
-   * 3. Reading and writing to data source needs to be typesafe
-   *
-   * This leads to 3 domain representation modes: st-editor(for post edition), client view(markdown-ready) and domain
-   * model classes which are used for generation of both views
-   *
-   * Logic:
-   *
-   * 1. st -> [ domain model ] -> database
-   *
-   * 2. database -> st JSON
-   *
-   * 3. database -> markdown json
-   *
-   *
-   *
-   * IDEA: store `data` field of type JsValue
-   *
-   * Predefined READS https://www.playframework.com/documentation/2.3.1/ScalaJsonCombinators
-  */
+object JsonPostTransformer {
 
   private val arrayTransformer = (__ \ 'data).json.pick[JsArray]
   private val tagsTransformer = (__ \ 'tags).json.pick[JsArray]
@@ -91,7 +77,7 @@ object JsonTransformer {
         val extractedTags = extractTags(json).getOrElse(List())
 
         extractBlocksFromPostJson(json) map {
-              //TODO: fix date creation in outer blocks of code
+          //TODO: fix date creation in outer blocks of code
           blocks => Post(title = title, body = blocks, displayedDate = None, tags = extractedTags, comments = Nil, date = -1L)
         }
     }
@@ -106,7 +92,7 @@ object JsonTransformer {
     }
   }
 
-  def extractBlocksFromPostJson(json: JsValue): Option[List[DataBlock]] = {
+  private def extractBlocksFromPostJson(json: JsValue): Option[List[DataBlock]] = {
     json.transform(arrayTransformer) match {
       case s: JsSuccess[JsArray] =>
         val arr = s.get
@@ -124,22 +110,15 @@ object JsonTransformer {
     }
   }
 
-  private def getStringValue(jsValue: JsValue, reads: Reads[JsString]): Option[String] = {
-    jsValue.transform(reads) match {
-      case s: JsSuccess[JsString] => Some(s.get.value)
-      case _ => None
-    }
-  }
-
   private def getImage(jsValue: JsValue): Option[String] = getStringValue(jsValue, imageTransformer)
   private def getText(jsValue: JsValue): Option[String] = getStringValue(jsValue, textTransformer)
   private def getType(jsValue: JsValue): Option[String] = getStringValue(jsValue, typeTransformer)
   private def getGist(jsValue: JsValue): Option[String] = getStringValue(jsValue, gistTransformer)
 
-
-  def main(args: Array[String]): Unit = {
-    val sample = Json.parse("{\"title\":\"test\",\"data\":[{\"type\":\"text\",\"data\":{\"text\":\"any\"}},{\"type\":\"image\",\"data\":{\"file\":{\"url\":\"werwerwer\"}}}], \"tags\":[\"one\", \"two\"]}")
-
-    extractTags(sample) foreach println
+  private def getStringValue(jsValue: JsValue, reads: Reads[JsString]): Option[String] = {
+    jsValue.transform(reads) match {
+      case s: JsSuccess[JsString] => Some(s.get.value)
+      case _ => None
+    }
   }
 }

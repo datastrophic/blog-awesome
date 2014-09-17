@@ -1,7 +1,7 @@
 package controllers
 
 import securesocial.core.{Authorization, RuntimeEnvironment}
-import auth.SocialUser
+import auth.{SecureSocialAuth, SocialUser}
 import play.api.mvc.RequestHeader
 import play.api.libs.json.Json
 import play.api.{Play, Logger}
@@ -17,7 +17,9 @@ import com.typesafe.config.ConfigFactory
 /**
  * Created by akirillov on 8/20/14.
  */
-class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {
+class ImageController (override implicit val env: RuntimeEnvironment[SocialUser])
+  extends securesocial.core.SecureSocial[SocialUser]  with SecureSocialAuth{
+
   private val logger = Logger("[ImageController]")
 
   private val config = ConfigFactory.load()
@@ -67,12 +69,4 @@ class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]
 
     filePart.ref.moveTo(new File(scalaxPath.toURI), replace = true)
   }
-
-  // An Authorization implementation that only authorizes uses that logged in using twitter
-  case class WithProvider(provider: String) extends Authorization[SocialUser] {
-    def isAuthorized(user: SocialUser, request: RequestHeader) = {
-      user.profile.providerId == provider
-    }
-  }
-
 }

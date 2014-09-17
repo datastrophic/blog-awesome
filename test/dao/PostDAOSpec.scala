@@ -3,16 +3,12 @@ package dao
 import org.specs2.mutable._
 import db.ReactiveCouchbaseClient
 import scala.concurrent.Await
-import play.api.libs.json.Json
 import scala.concurrent.duration._
 import org.specs2.time.NoTimeConversions
 import util.PostGenerator
-import domain.{Post, PostPage}
+import domain.{Post, ViewPage}
 
 
-/**
- * Created by akirillov on 9/16/14.
- */
 class PostDAOSpec extends Specification with ReactiveCouchbaseClient with NoTimeConversions{
 
   val tid0 = "test_id_0"
@@ -97,12 +93,12 @@ class PostDAOSpec extends Specification with ReactiveCouchbaseClient with NoTime
 
       val expectedFirstPagePosts = Await.result(PostDAO.findDrafts(1), 5 seconds)
 
-      expectedFirstPagePosts.size mustEqual PostPage.PageSize
+      expectedFirstPagePosts.size mustEqual ViewPage.PageSize
       expectedFirstPagePosts.head.id mustEqual posts.last.id //saved last, shown first
 
       val expectedLastPagePosts = Await.result(PostDAO.findDrafts(3), 5 seconds)
 
-      expectedLastPagePosts.size mustEqual (posts.size - 2*PostPage.PageSize)
+      expectedLastPagePosts.size mustEqual (posts.size - 2*ViewPage.PageSize)
       expectedLastPagePosts.last.id mustEqual posts.head.id
 
       posts.foreach(post => Await.result(PostDAO.delete(posts.indexOf(post).toString), 5 seconds))

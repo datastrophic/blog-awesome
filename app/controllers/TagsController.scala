@@ -1,7 +1,7 @@
 package controllers
 
 import securesocial.core.{Authorization, RuntimeEnvironment}
-import auth.SocialUser
+import auth.{SecureSocialAuth, SocialUser}
 import play.api.mvc.{BodyParsers, RequestHeader}
 import play.api.libs.json.Json
 import play.api.{Play, Logger}
@@ -12,7 +12,9 @@ import scala.concurrent.duration._
 /**
  * Created by akirillov on 8/20/14.
  */
-class TagsController (override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {
+class TagsController (override implicit val env: RuntimeEnvironment[SocialUser])
+  extends securesocial.core.SecureSocial[SocialUser]  with SecureSocialAuth{
+
   private val logger = Logger("[TagsController]")
 
   def getTagList = UserAwareAction {
@@ -23,12 +25,4 @@ class TagsController (override implicit val env: RuntimeEnvironment[SocialUser])
         Ok(Json.toJson(List[String]()))
       }
   }
-
-  // An Authorization implementation that only authorizes uses that logged in using twitter
-  case class WithProvider(provider: String) extends Authorization[SocialUser] {
-    def isAuthorized(user: SocialUser, request: RequestHeader) = {
-      user.profile.providerId == provider
-    }
-  }
-
 }

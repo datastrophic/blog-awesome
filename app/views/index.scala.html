@@ -1,8 +1,8 @@
-@(user: Option[auth.SocialUser])(previews: List[domain.Preview], page: domain.PostPage)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
+@(user: Option[auth.SocialUser])(previews: List[domain.PostPreview], page: domain.ViewPage)(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 
 @import auth.SocialUser
-@import domain.Preview
-@import domain.PostPage
+@import domain.PostPreview
+@import domain.ViewPage
 
 <!DOCTYPE html>
 
