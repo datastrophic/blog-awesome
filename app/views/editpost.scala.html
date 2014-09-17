@@ -39,7 +39,7 @@
             <div class="row">
                     <!-- Blog Post Content Column -->
                 <div class="col-md-10 col-md-offset-1">
-                    <form>
+                    <form id="postForm">
                         <textarea id="postBody" class="js-sir-trevor-instance">@play.twirl.api.Html(body.getOrElse(""))</textarea>
                         <button type="submit" class="btn btn-default">Submit</button>
                     </form>
@@ -67,7 +67,7 @@
         $(document).ready(function(){
 
             $("#post-submit-button" ).click(function(){
-                $("form").submit();
+                $("#postForm").submit();
             });
 
             $("form").submit(function(e) {

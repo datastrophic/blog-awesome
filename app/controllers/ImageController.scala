@@ -2,7 +2,7 @@ package controllers
 
 import securesocial.core.{Authorization, RuntimeEnvironment}
 import auth.SocialUser
-import play.api.mvc.{RequestHeader, Action}
+import play.api.mvc.RequestHeader
 import play.api.libs.json.Json
 import play.api.{Play, Logger}
 import java.security.SecureRandom
@@ -10,47 +10,26 @@ import play.api.mvc.MultipartFormData.FilePart
 import play.api.libs.Files.TemporaryFile
 import java.io.File
 import java.math.BigInteger
-import exception.ConfigurationException
 import scalax.file.Path
 import play.api.Play.current
+import com.typesafe.config.ConfigFactory
 
 /**
  * Created by akirillov on 8/20/14.
  */
 class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {
-
-//  def upload = UserAwareAction(parse.multipartFormData) { request =>
-//    request.body.file("picture").map { picture =>
-//      import java.io.File
-//      val filename = picture.filename
-//      val contentType = picture.contentType
-//      picture.ref.moveTo(new File(s"/tmp/picture/$filename"))
-//      Ok("File uploaded")
-//    }.getOrElse {
-//      Redirect(routes.Application.index).flashing(
-//        "error" -> "Missing file")
-//    }
-//  }
-
   private val logger = Logger("[ImageController]")
 
+  private val config = ConfigFactory.load()
 
-  private val currentHost: String = Play.configuration.getString("current.host") match {
-    case Some(p) => p
-    case _ => throw ConfigurationException("current.host is not defined in configuration")
-  }
-
-  private val imageFolder: String = Play.configuration.getString("image.system.path") match {
-    case Some(p) => p
-    case _ => throw ConfigurationException("image.system.path is not defined in configuration")
-  }
+  private val currentHost: String = config.getString("current.host")
+  private val imageFolder: String = config.getString("image.system.path")
 
   val pathPrefix = if (Play.isProd) s"$imageFolder" else s"/tmp/playblog"
 
-
   private val random = new SecureRandom()
 
-  def uploadImage = UserAwareAction(parse.multipartFormData) {
+  def uploadImage = SecuredAction(parse.multipartFormData) {
     implicit request =>
       println(request.body)
       request.body.file("attachment[file]").map {

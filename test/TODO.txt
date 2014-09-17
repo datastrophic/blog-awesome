@@ -1,0 +1,9 @@
+Business logic tests:
+    Post CRUD (with publish if possible) -> done
+    Tags merge
+    Images CRUD
+
+Controllers tests:
+    Create SecureSocial wrapper
+    Test post workflow within controllers
+

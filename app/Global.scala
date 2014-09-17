@@ -15,7 +15,7 @@
  *
  */
 
-import auth.{SocialUserService, SocialUser, MyEventListener}
+import auth.{SocialUserService, SocialUser, CustomEventListener}
 //import controllers.CustomRoutesService
 import java.lang.reflect.Constructor
 import securesocial.core.RuntimeEnvironment
@@ -28,7 +28,7 @@ object Global extends play.api.GlobalSettings {
   object MyRuntimeEnvironment extends RuntimeEnvironment.Default[SocialUser] {
 //    override lazy val routes = new CustomRoutesService()
     override lazy val userService: SocialUserService = new SocialUserService()
-    override lazy val eventListeners = List(new MyEventListener())
+    override lazy val eventListeners = List(new CustomEventListener())
   }
 
   /**

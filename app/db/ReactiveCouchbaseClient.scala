@@ -4,6 +4,8 @@ import scala.concurrent.ExecutionContext
 import org.reactivecouchbase.{CouchbaseBucket, ReactiveCouchbaseDriver}
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
+import play.api.{Play, Configuration}
+import com.typesafe.config.ConfigFactory
 
 
 /**
@@ -22,6 +24,9 @@ object ReactiveCouchbaseClient {
   implicit val ec = ExecutionContext.Implicits.global
   val timeout = Duration(10, TimeUnit.SECONDS)
 
+  val config = ConfigFactory.load()
+
   val driver = ReactiveCouchbaseDriver()
-  val bucket = driver.bucket("octopus")
+  val bucketName = config.getString("couchbase.default.bucket")
+  val bucket = driver.bucket(bucketName)
 }

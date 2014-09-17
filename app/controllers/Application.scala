@@ -24,7 +24,7 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
     Ok(views.html.index(request.user)(previews.take(PostPage.PageSize), postPage))
   }
 
-  def editpost(uid: Option[String]) = UserAwareAction { implicit request =>
+  def editpost(uid: Option[String]) = SecuredAction { implicit request =>
     uid map { uid =>
       Await.result(PostDAO.get(uid), 5 seconds) map { post =>
 
@@ -32,9 +32,9 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
 
         println(tags)
 
-        Ok(views.html.editpost(post.id, Some(post.title), Some(JsonTransformer.buildSirTrevorBlocks(post).toString()), tags)(request.user))
+        Ok(views.html.editpost(post.id, Some(post.title), Some(JsonTransformer.buildSirTrevorBlocks(post).toString()), tags)(Some(request.user)))
       } getOrElse(BadRequest(s"Post with uid $uid not found!"))
-    } getOrElse Ok(views.html.editpost(None, None, None, None)(request.user))
+    } getOrElse Ok(views.html.editpost(None, None, None, None)(Some(request.user)))
   }
 
   def post(uid: String) = UserAwareAction { implicit request =>
@@ -44,32 +44,31 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
       } getOrElse(Redirect("/"))
   }
 
-  def publishPost(uid: String) = UserAwareAction { implicit request =>
+  def publishPost(uid: String) = SecuredAction { implicit request =>
     println(s"submit request for post with id: $uid")
     Await.result(PostDAO.get(uid.trim), 5 seconds) map { post =>
       val newPost = post.copy(isDraft = false)
 
-      //have to wait to display newly published post in feed
-      Await.result(PostDAO.save(uid, newPost), 5 seconds)
+      PostDAO.save(uid, newPost)
 
-      TagDao.mergeTags(post.tags)//! happens only when post submitted to minimize amount of trash tags
+      TagDao.mergeTags(post.tags)//! happens only when post published to minimize amount of trash tags
 
       Redirect("/")
     } getOrElse(BadRequest(s"Draft with uid $uid does not exist!"))
   }
 
-  def delete(uid: String) = UserAwareAction { implicit request =>
+  def delete(uid: String) = SecuredAction { implicit request =>
     println(s"delete request for post with id: $uid")
     PostDAO.delete(uid.trim)
     Ok("post deleted")
   }
 
-  def drafts(page: Option[Int]) = UserAwareAction { implicit request =>
+  def drafts(page: Option[Int]) = SecuredAction { implicit request =>
     val previews = Await.result(PostDAO.findDrafts(page.getOrElse(1)), 5 seconds) map {post => Preview.fromPost(post)}
 
     val postPage = createPage("/drafts", previews, page)
 
-    Ok(views.html.index(request.user)(previews.take(PostPage.PageSize), postPage))
+    Ok(views.html.index(Some(request.user))(previews.take(PostPage.PageSize), postPage))
   }
 
   def postsByTag(tag: String, page: Option[Int]) = UserAwareAction { implicit request =>
@@ -100,7 +99,7 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
     }
   }
 
-  def createPost = UserAwareAction(BodyParsers.parse.json) {
+  def createPost = SecuredAction(BodyParsers.parse.json) {
     implicit request =>
       println(request.body)
       val newPost = JsonTransformer.createPostFromJson(request.body)
@@ -117,7 +116,7 @@ class Application(override implicit val env: RuntimeEnvironment[SocialUser]) ext
       }
   }
 
-  def updatePost(uid: String) = UserAwareAction(BodyParsers.parse.json) {
+  def updatePost(uid: String) = SecuredAction(BodyParsers.parse.json) {
     implicit request =>
 
       val newPost = JsonTransformer.createPostFromJson(request.body)

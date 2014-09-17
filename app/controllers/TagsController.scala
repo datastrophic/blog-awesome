@@ -15,8 +15,6 @@ import scala.concurrent.duration._
 class TagsController (override implicit val env: RuntimeEnvironment[SocialUser]) extends securesocial.core.SecureSocial[SocialUser] {
   private val logger = Logger("[TagsController]")
 
-
-
   def getTagList = UserAwareAction {
     implicit request =>
       Await.result(TagDao.getTags, 5 seconds) map {

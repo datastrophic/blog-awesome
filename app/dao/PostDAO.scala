@@ -17,7 +17,7 @@ object PostDAO extends BaseDao[Post]{
   /**
    * Only published posts are shown, drafts are ignored (see by_tag couchbase view)
    */
-  def findPostsByTag(tag: String, pageNum: Int) = {
+  def findPostsByTag(tag: String, pageNum: Int): Future[List[Post]] = {
     executeWithBucket(bucket => {
 
       val query = new Query()
@@ -26,10 +26,11 @@ object PostDAO extends BaseDao[Post]{
         .setRangeEnd(ComplexKey.of(tag).forceArray(true))
         .setInclusiveEnd(true)
         .setDescending(true)
-        .setLimit(PostPage.PageSize + 1)
+        .setLimit(PostPage.PageSize)
         .setSkip(PostPage.PageSize * (pageNum-1))
+        .setStale(Stale.FALSE)
 
-      bucket.find[Post]("doc", "by_tag")(query)
+        bucket.find[Post]("doc", "by_tag")(query)
     })
   }
 
@@ -46,8 +47,9 @@ object PostDAO extends BaseDao[Post]{
         .setRangeEnd(ComplexKey.of(isDraft).forceArray(true))
         .setInclusiveEnd(true)
         .setDescending(true)
-        .setLimit(PostPage.PageSize + 1)
+        .setLimit(PostPage.PageSize)
         .setSkip(PostPage.PageSize * (pageNum-1))
+        .setStale(Stale.FALSE)
 
       bucket.find[Post]("doc", "by_draft")(query)
     })

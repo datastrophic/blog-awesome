@@ -11,6 +11,8 @@ resolvers ++= Seq(
   "ReactiveCouchbase repository" at "https://raw.github.com/ReactiveCouchbase/repository/master/snapshots"
 )
 
+javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
+
 libraryDependencies ++= Seq(
     filters,
     cache,
@@ -33,5 +35,6 @@ libraryDependencies ++= Seq(
     "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
     "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3",
     "com.sksamuel.scrimage" %% "scrimage-core" % "1.3.20",
-    "com.sksamuel.scrimage" %% "scrimage-filters" % "1.3.20"
+    "com.sksamuel.scrimage" %% "scrimage-filters" % "1.3.20",
+    "org.scalatestplus" %% "play" % "1.1.0"
 )
