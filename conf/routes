@@ -22,4 +22,6 @@ GET           /logout               @controllers.CustomLoginController.logout
 POST          /image                @controllers.ImageController.uploadImage
 GET           /taglist              @controllers.TagsController.getTagList
 
+GET           /auth/login           @controllers.CustomLoginController.login
+
 ->            /auth                 securesocial.Routes

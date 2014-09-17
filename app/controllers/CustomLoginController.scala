@@ -9,5 +9,5 @@ import securesocial.core.providers.UsernamePasswordProvider
 import auth.SocialUser
 
 class CustomLoginController(implicit override val env: RuntimeEnvironment[SocialUser]) extends BaseLoginPage[SocialUser]{
-  override def login: Action[AnyContent] = super.login
+  override def login: Action[AnyContent] = Action{ BadRequest("You're not allowed to be here, sorry.") }
 }
