@@ -77,20 +77,40 @@ object PostService {
 
   def createViewPage(sourceURL: String, previews: List[PostPreview], pageNum: Option[Int]): ViewPage = {
 
-    (pageNum, previews.size <= ViewPage.PageSize) match {
-      //in the middle
-      case (Some(page: Int), true) =>
+    pageNum match {
+      case Some(page) => {
         val prev = if(page == 2) "" else s"?page=${page-1}"
-        ViewPage(previous = Some(sourceURL + prev), next = None)
-      //last page
-      case (Some(page: Int), false) =>
-        val prev = if(page == 2) "" else s"?page=${page-1}"
-        ViewPage(previous = Some(sourceURL + prev), next = Some(sourceURL+s"?page=${page+1}"))
-      //no posts around
-      case (None, true) => ViewPage(previous = None, next = None)
-      //first page
-      case (None, false) => ViewPage(previous = None, next = Some(sourceURL+s"?page=2"))
-    }
-  }
 
+        if(previews.size == ViewPage.PageSize){
+          ViewPage(previous = Some(sourceURL + prev), next = Some(sourceURL+s"?page=${page+1}"))
+        } else {
+          ViewPage(previous = Some(sourceURL + prev), next = None)
+        }
+
+      }
+      case None => {
+        if(previews.size == ViewPage.PageSize){
+          ViewPage(previous = None, next = Some(sourceURL+s"?page=2"))
+        } else {
+          ViewPage(previous = None, next = None)
+        }
+      }
+    }
+
+
+//    (pageNum, previews.size <= ViewPage.PageSize) match {
+//      //in the middle
+//      case (Some(page: Int), true) =>
+//        val prev = if(page == 2) "" else s"?page=${page-1}"
+//        ViewPage(previous = Some(sourceURL + prev), next = None)
+//      //last page
+//      case (Some(page: Int), false) =>
+//        val prev = if(page == 2) "" else s"?page=${page-1}"
+//        ViewPage(previous = Some(sourceURL + prev), next = Some(sourceURL+s"?page=${page+1}"))
+//      //no posts around
+//      case (None, true) => ViewPage(previous = None, next = None)
+//      //first page
+//      case (None, false) => ViewPage(previous = None, next = Some(sourceURL+s"?page=2"))
+//    }
+  }
 }

@@ -1,3 +1,5 @@
+import play.PlayScala
+
 name := """myawesomeblog"""
 
 version := "1.0-SNAPSHOT"
@@ -8,6 +10,7 @@ scalaVersion := "2.11.1"
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots"),
+  Classpaths.sbtPluginReleases,
   "ReactiveCouchbase repository" at "https://raw.github.com/ReactiveCouchbase/repository/master/snapshots"
 )
 
@@ -40,3 +43,5 @@ libraryDependencies ++= Seq(
     "com.sksamuel.scrimage" %% "scrimage-filters" % "1.3.20",
     "org.scalatestplus" %% "play" % "1.1.0"
 )
+
+instrumentSettings

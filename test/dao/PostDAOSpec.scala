@@ -87,7 +87,7 @@ class PostDAOSpec extends Specification with ReactiveCouchbaseClient with NoTime
 
     "provide proper pagination and ordering" in {
       //default page size is 10, default post state is draft, ids: from zero to amount-1
-      val posts = PostGenerator.generate(23)
+      val posts = PostGenerator.generateDrafts(23)
 
       posts.foreach(post => Await.result(PostDAO.save(posts.indexOf(post).toString, post), 5 seconds))
 

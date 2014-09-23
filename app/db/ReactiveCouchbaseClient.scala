@@ -4,7 +4,6 @@ import scala.concurrent.ExecutionContext
 import org.reactivecouchbase.{CouchbaseBucket, ReactiveCouchbaseDriver}
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
-import play.api.{Play, Configuration}
 import com.typesafe.config.ConfigFactory
 
 

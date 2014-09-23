@@ -1,29 +1,57 @@
 package util
 
 import domain.{Comment, Post}
-import java.text.SimpleDateFormat
-import java.util.{Date, Calendar, GregorianCalendar, Locale}
+import java.util._
+import db.ReactiveCouchbaseClient
+import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.duration._
+import scala.List
+import scala.Some
+import domain.Post
 
-/**
- * Created by akirillov on 8/14/14.
- */
-object PostGenerator {
-    def generate(amount: Int): List[Post] = {
-      (0 to amount-1) map { i =>
-        Thread.sleep(5)
+object PostGenerator{
 
-        createBlankPost.copy(id = Some(s"${i.toString}_${new Date().getTime}"))
+  def generatePublishedPosts(amount: Int): List[Post] = {
+    generateDrafts(amount) map (post => post.copy(isDraft = false))
+  }
 
-      } toList
-    }
+  def generateDrafts(amount: Int): List[Post] = {
+    (0 to amount-1) map { i =>
+      Thread.sleep(5)
 
+      createBlankPost
 
+    } toList
+  }
+
+  def generateTaggedPosts(tags: List[String], amount: Int): List[Post] = {
+    (0 to amount-1) map { i =>
+      Thread.sleep(5)
+
+      createPostWithTags(tags)
+
+    } toList
+  }
 
   def createPostWithTag(tag: String): Post = createPublishedPost.copy(tags = List(tag))
+
+  def createPostWithTags(tags: List[String]): Post = createPublishedPost.copy(tags = tags)
 
   def createPublishedPost = createBlankPost.copy(isDraft = false)
 
   def createDraftPost = createBlankPost
 
-  def createBlankPost = Post(title = "sample", body = Nil, displayedDate = None, date = new Date().getTime)
+  def createBlankPost = Post(id = Some(generateUid), title = "sample", body = Nil, displayedDate = None, date = new Date().getTime)
+
+  def generateUid = UUID.randomUUID().toString
+
+  def main(args: Array[String]){
+    implicit val ec = ExecutionContext.Implicits.global
+
+    try {
+      Await.result(ReactiveCouchbaseClient.bucket.flush(), 15 seconds)
+    } catch {
+      case e: UnsupportedOperationException => println(e.getMessage)
+    }
+  }
 }

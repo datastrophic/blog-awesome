@@ -1,36 +1,29 @@
 package dao
 
-import domain.Post
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, ExecutionContext, Await}
-import scala.concurrent.duration._
-import domain.DomainJsonFormats._
+import scala.concurrent.Future
 import org.reactivecouchbase.client.OpResult
-import play.api.libs.json.{JsObject, Writes, Reads}
-import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
+import net.spy.memcached.ops.OperationStatus
 
-/**
- * Created by akirillov on 8/28/14.
- */
 object TagDao extends BaseDao[List[String]]{
 
-  private val TagKey = "fo::tags"
+  val TagKey = "fo::tags"
 
-  def getTags = {
-    get(TagKey)
+  //if key is not defined empty list is returned
+  def getTags: Future[List[String]] = {
+    get(TagKey).map(option => option.fold(List[String]())(identity[List[String]]))
   }
 
-  def mergeTags(tags: List[String]) = {
+  def mergeTags(tags: List[String]): Future[OpResult] = {
     if(!tags.isEmpty) {
-
-      get(TagKey) map {
+      get(TagKey) flatMap {
         case Some(savedTags) =>
           val mergedTagsSet = savedTags.toSet[String] ++ tags
           save(TagKey, mergedTagsSet.toList)
         case None => save(TagKey, tags)
       }
-
-    }
+    } else Future(OpResult(new OperationStatus(true, "Input tag list is empty, no DB operations needed.")))
   }
+
 
 }

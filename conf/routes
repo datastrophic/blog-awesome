@@ -17,11 +17,12 @@ GET           /edit                 @controllers.PostController.postEditPage(uid
 POST          /post                 @controllers.PostController.createPost
 PATCH         /post/:uid            @controllers.PostController.updatePost(uid)
 GET           /drafts               @controllers.PostController.getDraftsPage(page: Option[Int])
+
 GET           /logout               @controllers.CustomLoginController.logout
+GET           /auth/login           @controllers.CustomLoginController.login
+GET           /unauthorized         @controllers.CustomLoginController.unauthorized
 
 POST          /image                @controllers.ImageController.uploadImage
 GET           /taglist              @controllers.TagsController.getTagList
-
-GET           /auth/login           @controllers.CustomLoginController.login
 
 ->            /auth                 securesocial.Routes

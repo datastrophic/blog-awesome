@@ -19,10 +19,8 @@ class TagsController (override implicit val env: RuntimeEnvironment[SocialUser])
 
   def getTagList = UserAwareAction {
     implicit request =>
-      Await.result(TagDao.getTags, 5 seconds) map {
-        tags => Ok(Json.toJson(tags))
-      } getOrElse {
-        Ok(Json.toJson(List[String]()))
-      }
+      val tags = Await.result(TagDao.getTags, 5 seconds)
+
+      Ok(Json.toJson(tags))
   }
 }
