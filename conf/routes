@@ -20,7 +20,7 @@ GET           /drafts               @controllers.PostController.getDraftsPage(pa
 
 GET           /logout               @controllers.CustomLoginController.logout
 GET           /auth/login           @controllers.CustomLoginController.login
-GET           /unauthorized         @controllers.CustomLoginController.unauthorized
+GET           /notfound             @controllers.CustomLoginController.unauthorized
 
 POST          /image                @controllers.ImageController.uploadImage
 GET           /taglist              @controllers.TagsController.getTagList

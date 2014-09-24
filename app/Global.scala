@@ -16,6 +16,10 @@
  */
 
 import auth.{SocialUserService, SocialUser, CustomEventListener}
+import play.api.mvc.RequestHeader
+import scala.concurrent.Future
+import play.api.mvc.Results._
+
 //import controllers.CustomRoutesService
 import java.lang.reflect.Constructor
 import securesocial.core.RuntimeEnvironment
@@ -49,5 +53,13 @@ object Global extends play.api.GlobalSettings {
       _.asInstanceOf[Constructor[A]].newInstance(MyRuntimeEnvironment)
     }
     instance.getOrElse(super.getControllerInstance(controllerClass))
+  }
+
+  override def onHandlerNotFound(request: RequestHeader) = {
+    implicit val env = Global.MyRuntimeEnvironment
+    implicit val header = request
+    Future.successful(
+      NotFound(views.html.notfound(None))
+    )
   }
 }

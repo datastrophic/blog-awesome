@@ -20,14 +20,14 @@
             <div class="page-header" id="banner">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
-                        <h2>@post.title</h2>
+                        <h1>@post.title</h1>
                             <!-- Date/Time -->
-                        <p>
+                        <p><small>
                         @for(tag <- post.tags){
                             <a href="/post/tag/@tag" class="label label-default">@tag</a>
                         }
-                        </p>
-                        <h6><span class="glyphicon glyphicon-time"></span> Posted on @post.displayedDate.getOrElse("...")</h6>
+                        </small></p>
+                        <p><small><span class="glyphicon glyphicon-time"></span> Posted on @post.displayedDate.getOrElse("...")</small></p>
                         <hr>
                     </div>
                 </div>
