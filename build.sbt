@@ -16,6 +16,8 @@ resolvers ++= Seq(
 
 javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
 
+parallelExecution in Test := false
+
 javacOptions in Compile ++= Seq("-source", "1.8", "-target", "1.8")
 
 libraryDependencies ++= Seq(
