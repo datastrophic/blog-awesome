@@ -1,0 +1,55 @@
+@(user: Option[auth.SocialUser])(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
+@import auth.SocialUser
+
+<!DOCTYPE html>
+
+<html>
+    @head()
+
+    <body>
+        @navbar(user)(None)(editMode = false)
+
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/gist-embed/gist-embed.js")'></script>
+
+
+        <!-- Page Content -->
+        <div class="container">
+            <div class="page-header" id="banner">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <h1>About</h1>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                    <!-- Blog Post Content Column -->
+                <div class="col-md-10 col-md-offset-1">
+                    @* for(block <- post.body){
+                        @if(block.`type` == "text") {
+                            <p class="md-content">@{block.data}</p>
+                        } 
+
+                        @if(block.`type` == "gist") {
+                            <code data-gist-id="@{block.data}"></code>
+                        }
+
+                        @if(block.`type` == "image") {
+                            <div style="text-align: center">
+                                <p class="md-content">![](@{block.data})</p>
+                            </div>
+                        }
+                    } *@
+                    <hr>
+
+                </div>
+
+                </div>
+            <hr>
+          @footer()
+        </div>
+    </body>
+
+</html>
