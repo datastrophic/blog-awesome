@@ -27,7 +27,7 @@
                             <a href="/post/tag/@tag" class="label label-default">@tag</a>
                         }
                         </p>
-                        <h6><span class="glyphicon glyphicon-time"></span> Posted on @post.displayedDate.get</h6>
+                        <h6><span class="glyphicon glyphicon-time"></span> Posted on @post.displayedDate.getOrElse("...")</h6>
                         <hr>
                     </div>
                 </div>

@@ -6,7 +6,7 @@ import domain.{DataBlock, PostPreview, ViewPage, Post}
 import dao.PostDAO
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import util.{StringAndDateUtils, PostGenerator}
+import util.{StringAndDateUtils, PostHelper}
 import play.api.libs.json.{Json, JsValue}
 import java.util.concurrent.ConcurrentLinkedQueue
 import scala.collection.JavaConversions._
@@ -24,7 +24,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
       val sampleUid = "post_key"
 
-      val post = PostGenerator.createBlankPost.copy(id = Some(sampleUid))
+      val post = PostHelper.createBlankPost.copy(id = Some(sampleUid))
       savePost(post)
 
       val foundPost = PostService.getPostById(sampleUid)
@@ -41,7 +41,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
     "correctly get posts list with pagination [getPosts]" in {
       val amount = 23
-      val posts = PostGenerator.generatePublishedPosts(amount)
+      val posts = PostHelper.generatePublishedPosts(amount)
 
       posts foreach savePost
 
@@ -61,7 +61,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
     "correctly get drafts with pagination [getDrafts]" in {
       val amount = 23
-      val posts = PostGenerator.generateDrafts(amount)
+      val posts = PostHelper.generateDrafts(amount)
 
       posts foreach savePost
 
@@ -83,8 +83,8 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       val tags2 = List("another tag", "sample_tag")
       val amount = 23
 
-      val postsTag1 = PostGenerator.generateTaggedPosts(tags1, amount)
-      val postTag2 = PostGenerator.createPostWithTags(tags2).copy(id = Some("tag2_test_post"))
+      val postsTag1 = PostHelper.generateTaggedPosts(tags1, amount)
+      val postTag2 = PostHelper.createPostWithTags(tags2).copy(id = Some("tag2_test_post"))
 
       postsTag1 foreach savePost
       savePost(postTag2)
@@ -121,7 +121,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
     "correctly delete post by id [deletePostById]" in {
 
       val uid = "Sample uid"
-      val post = PostGenerator.createBlankPost.copy(id = Some(uid))
+      val post = PostHelper.createBlankPost.copy(id = Some(uid))
       savePost(post)
 
       val foundPost = getById(uid)
@@ -170,7 +170,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       val title = "test title"
       val generatedUid = StringAndDateUtils.generateUID(title)
 
-      val samplePost = PostGenerator.createBlankPost.copy(id = Some(generatedUid))
+      val samplePost = PostHelper.createBlankPost.copy(id = Some(generatedUid))
 
       savePost(samplePost)
 
@@ -212,7 +212,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
     "correctly publish draft post [publishPost]" in {
 
       val uid = "test_uid"
-      val draft = PostGenerator.createDraftPost.copy(id = Some(uid))
+      val draft = PostHelper.createDraftPost.copy(id = Some(uid))
 
       savePost(draft)
 

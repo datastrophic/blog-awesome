@@ -13,7 +13,7 @@
     </div>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
         <ul class="nav navbar-nav">
-
+        @if(user.fold(false)(_.isAdmin)){
             @if(!post.isDefined){
                 @if(editMode){
                     <li><a href="#" id="post-submit-button">Submit</a></li>
@@ -36,6 +36,7 @@
             }
             <li><a href="/drafts">Drafts</a></li>
         </ul>
+        }
         <ul class="nav navbar-nav navbar-right">
             <li><a href="https://plus.google.com/u/0/+AntonKirillov/posts/p/pub"><i class="fa fa-google-plus fa-lg"></i></a></li>
             <li><a href="https://twitter.com/antonkirillov"><i class="fa fa-twitter fa-lg"></i></a></li>

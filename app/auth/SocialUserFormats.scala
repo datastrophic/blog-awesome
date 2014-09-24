@@ -7,9 +7,6 @@ import securesocial.core.BasicProfile
 import securesocial.core.PasswordInfo
 import securesocial.core.OAuth1Info
 
-/**
- * Created by akirillov on 8/13/14.
- */
 object SocialUserFormats {
 
   implicit val OAuth1InfoFormat = Json.format[OAuth1Info]

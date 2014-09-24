@@ -6,9 +6,6 @@ import securesocial.core.providers.MailToken
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.{BasicProfile, PasswordInfo}
 
-/**
- * Created by akirillov on 8/13/14.
- */
 class SocialUserService extends  UserService[SocialUser] with ReactiveCouchbaseClient{
 
  import SocialUserFormats._

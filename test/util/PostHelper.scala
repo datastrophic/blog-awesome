@@ -9,7 +9,7 @@ import scala.List
 import scala.Some
 import domain.Post
 
-object PostGenerator{
+object PostHelper{
 
   def generatePublishedPosts(amount: Int): List[Post] = {
     generateDrafts(amount) map (post => post.copy(isDraft = false))

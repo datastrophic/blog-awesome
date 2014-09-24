@@ -5,7 +5,7 @@ import db.ReactiveCouchbaseClient
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import org.specs2.time.NoTimeConversions
-import util.PostGenerator
+import util.PostHelper
 import domain.{Post, ViewPage}
 
 
@@ -25,9 +25,9 @@ class PostDAOSpec extends Specification with ReactiveCouchbaseClient with NoTime
       val tag2 = "tag_under_test_2"
 
       val taggedPosts = List(
-        ("tag_test_0", PostGenerator.createPostWithTag(tag1).copy(id = Some(tid0))),
-        ("tag_test_1", PostGenerator.createPostWithTag(tag1).copy(id = Some(tid1))),
-        ("tag_test_2", PostGenerator.createPostWithTag(tag2).copy(id = Some(tid2)))
+        ("tag_test_0", PostHelper.createPostWithTag(tag1).copy(id = Some(tid0))),
+        ("tag_test_1", PostHelper.createPostWithTag(tag1).copy(id = Some(tid1))),
+        ("tag_test_2", PostHelper.createPostWithTag(tag2).copy(id = Some(tid2)))
       )
 
       taggedPosts.foreach(post => Await.result(PostDAO.save(post._1, post._2), 5 seconds))
@@ -60,9 +60,9 @@ class PostDAOSpec extends Specification with ReactiveCouchbaseClient with NoTime
     "properly find drafts and published posts" in {
 
       val posts = List(
-        ("draft_test_0", PostGenerator.createDraftPost.copy(id = Some(tid0))),
-        ("draft_test_1", PostGenerator.createDraftPost.copy(id = Some(tid1))),
-        ("draft_test_2", PostGenerator.createPublishedPost.copy(id = Some(tid2)))
+        ("draft_test_0", PostHelper.createDraftPost.copy(id = Some(tid0))),
+        ("draft_test_1", PostHelper.createDraftPost.copy(id = Some(tid1))),
+        ("draft_test_2", PostHelper.createPublishedPost.copy(id = Some(tid2)))
       )
 
       posts.foreach(post => Await.result(PostDAO.save(post._1, post._2), 5 seconds))
@@ -87,7 +87,7 @@ class PostDAOSpec extends Specification with ReactiveCouchbaseClient with NoTime
 
     "provide proper pagination and ordering" in {
       //default page size is 10, default post state is draft, ids: from zero to amount-1
-      val posts = PostGenerator.generateDrafts(23)
+      val posts = PostHelper.generateDrafts(23)
 
       posts.foreach(post => Await.result(PostDAO.save(posts.indexOf(post).toString, post), 5 seconds))
 
