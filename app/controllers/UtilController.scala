@@ -11,8 +11,6 @@ import scala.concurrent.duration._
 class UtilController (override implicit val env: RuntimeEnvironment[SocialUser])
   extends securesocial.core.SecureSocial[SocialUser]  with SecureSocialAuth{
 
-  private val logger = Logger("[UtilController]")
-
   def about = UserAwareAction {
     implicit request =>
       Ok(views.html.about(request.user))

@@ -16,23 +16,25 @@
  */
 
 import auth.{SocialUserService, SocialUser, CustomEventListener}
-import play.api.mvc.RequestHeader
+import play.api.GlobalSettings
+import play.api.mvc._
 import scala.concurrent.Future
 import play.api.mvc.Results._
-
-//import controllers.CustomRoutesService
 import java.lang.reflect.Constructor
 import securesocial.core.RuntimeEnvironment
 
-object Global extends play.api.GlobalSettings {
+object Global extends GlobalSettings{
 
   /**
    * The runtime environment for this sample app.
    */
   object MyRuntimeEnvironment extends RuntimeEnvironment.Default[SocialUser] {
-//    override lazy val routes = new CustomRoutesService()
     override lazy val userService: SocialUserService = new SocialUserService()
     override lazy val eventListeners = List(new CustomEventListener())
+  }
+
+  override def doFilter(next: EssentialAction): EssentialAction = {
+    Filters(super.doFilter(next), AccessLoggingFilter)
   }
 
   /**
@@ -40,10 +42,6 @@ object Global extends play.api.GlobalSettings {
    * passes the instance to it if required.
    *
    * This can be replaced by any DI framework to inject it differently.
-   *
-   * @param controllerClass
-   * @tparam A
-   * @return
    */
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
     val instance  = controllerClass.getConstructors.find { c =>

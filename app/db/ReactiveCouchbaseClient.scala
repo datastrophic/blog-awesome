@@ -6,11 +6,6 @@ import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 import com.typesafe.config.ConfigFactory
 
-
-/**
- * Created by akirillov on 8/13/14.
- */
-
 trait ReactiveCouchbaseClient {
   import ReactiveCouchbaseClient._
 

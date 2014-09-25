@@ -9,9 +9,6 @@ import org.reactivecouchbase.client.OpResult
 import play.api.libs.json.{Json, JsObject, Writes, Reads}
 import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
 
-/**
- * Created by akirillov on 8/14/14.
- */
 object PostDAO extends BaseDao[Post]{
 
   /**

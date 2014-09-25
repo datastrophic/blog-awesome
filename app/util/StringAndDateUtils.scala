@@ -3,9 +3,6 @@ package util
 import java.text.DateFormatSymbols
 import java.util.{Calendar, GregorianCalendar}
 
-/**
- * Created by akirillov on 8/28/14.
- */
 object StringAndDateUtils {
 
   def generateUID(title: String): String = {

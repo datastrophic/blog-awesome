@@ -14,9 +14,6 @@ import scalax.file.Path
 import play.api.Play.current
 import com.typesafe.config.ConfigFactory
 
-/**
- * Created by akirillov on 8/20/14.
- */
 class ImageController (override implicit val env: RuntimeEnvironment[SocialUser])
   extends securesocial.core.SecureSocial[SocialUser]  with SecureSocialAuth{
 
@@ -33,25 +30,21 @@ class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]
 
   def uploadImage = SecuredAction(parse.multipartFormData) {
     implicit request =>
-      println(request.body)
-      request.body.file("attachment[file]").map {
-        picture =>
-          logger.info("Got service image upload request")
-              val url = saveUploadedImage(picture)
-              Ok(Json.obj("file" -> Json.obj("url" -> url)))
-      }.getOrElse {
-        BadRequest("Errors occurred")
+      request.body.file("attachment[file]").fold(BadRequest("Errors occurred")){picture =>
+        val url = saveUploadedImage(picture)
+        Ok(Json.obj("file" -> Json.obj("url" -> url)))
       }
   }
 
   private def saveUploadedImage(filePart: FilePart[TemporaryFile]): String = {
+    logger.info("Saving image")
     val fileName = generateNewFileName(filePart.filename)
     val path = s"images/$fileName"
 
     saveImage(filePart, path)
 
     val url = s"$currentHost/$path"
-    logger.info(s"Generated url: $url")
+    logger.info(s"Image saved, generated url: $url")
     url
   }
 
@@ -62,11 +55,13 @@ class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]
 
   def saveImage(filePart: FilePart[TemporaryFile], path: String) = {
     val fileName = s"$pathPrefix/$path"
-    logger.info(s"Saving image $fileName")
+    logger.info(s"Writing file $fileName")
 
     val scalaxPath: Path = Path.fromString(fileName)
     scalaxPath.createFile(failIfExists=false)
 
     filePart.ref.moveTo(new File(scalaxPath.toURI), replace = true)
+
+    logger.info(s"File $fileName saved to disk")
   }
 }

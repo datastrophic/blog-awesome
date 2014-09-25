@@ -7,55 +7,94 @@ import domain.{ViewPage, PostPreview, Post}
 import play.api.libs.json.JsValue
 import util.{StringAndDateUtils, JsonPostTransformer}
 import java.util.Date
+import play.api.Logger
 
 object PostService {
 
+  private val logger = Logger("[PostService]")
+
   def getPostById(uid: String): Option[Post] = {
-    Await.result(PostDAO.get(uid), 5 seconds)
+    logger.info(s"Attempting to get post by id [$uid]")
+
+    val post = Await.result(PostDAO.get(uid), 5 seconds)
+
+    logger.info(s"Post lookup by id [$uid] found: ${post.isDefined}")
+
+    post
   }
 
   def getPosts(pageNum: Option[Int]): List[PostPreview] = {
-    getPostPreviews(PostDAO.findSubmittedPosts(pageNum.getOrElse(1)))
+    logger.info(s"Attempting to get published posts page #${pageNum.getOrElse(1)}")
+    val previews = getPostPreviews(PostDAO.findSubmittedPosts(pageNum.getOrElse(1)))
+
+    logger.info(s"${previews.size} published posts found for page #${pageNum.getOrElse(1)}")
+    previews
   }
 
   def getDrafts(pageNum: Option[Int]): List[PostPreview] = {
-    getPostPreviews(PostDAO.findDrafts(pageNum.getOrElse(1)))
+    logger.info(s"Attempting to get drafts page #${pageNum.getOrElse(1)}")
+    val previews = getPostPreviews(PostDAO.findDrafts(pageNum.getOrElse(1)))
+
+    logger.info(s"${previews.size} drafts found for page #${pageNum.getOrElse(1)}")
+    previews
   }
 
   def getPostsByTag(tag: String, pageNum: Option[Int]): List[PostPreview] = {
-    getPostPreviews(PostDAO.findPostsByTag(tag, pageNum.getOrElse(1)))
+    logger.info(s"Attempting to get posts by tag [$tag], page #${pageNum.getOrElse(1)}")
+    val previews = getPostPreviews(PostDAO.findPostsByTag(tag, pageNum.getOrElse(1)))
+
+    logger.info(s"${previews.size} posts with tag [$tag] found for page #${pageNum.getOrElse(1)}")
+    previews
   }
 
-  def deletePostById(uid: String) = PostDAO.delete(uid)
+  def deletePostById(uid: String) = {
+    logger.info(s"Deleting post by uid [$uid]")
+    PostDAO.delete(uid)
+  }
 
   private def getPostPreviews(awaitablePosts: Future[List[Post]]): List[PostPreview] = {
     Await.result(awaitablePosts, 5 seconds) map { post => PostPreview.fromPost(post)}
   }
 
   def saveJsonPost(json: JsValue): Either[String,String] = {
+    logger.info("Saving post from JSON")
+
     val newPost = JsonPostTransformer.createPostFromJson(json)
 
     newPost map { p =>
+      logger.info("JSON parsed successfully")
+
       val generatedUID = StringAndDateUtils.generateUID(p.title)
       val dateAsMillis = new Date().getTime
 
       PostDAO.save(generatedUID, newPost.get.copy(id = Some(generatedUID), isDraft = true, displayedDate = StringAndDateUtils.getCurrentDateAsString, date = dateAsMillis))
+
+      logger.info(s"Post saved with uid [$generatedUID]")
 
       Right(generatedUID)
     } getOrElse Left(s"Json hasn't been parsed correctly:\n${json.toString}")
   }
 
   def updateExistingPost(uid: String, json: JsValue): Either[String,String] = {
+    logger.info(s"Updating post with uid [$uid] from JSON")
+
     val newPost = JsonPostTransformer.createPostFromJson(json)
 
     newPost map { p =>
+      logger.info("JSON parsed successfully")
+
       val generatedUID = StringAndDateUtils.generateUID(p.title)
 
       getPostById(uid.trim) map { savedPost =>
+        logger.info("Post for update found")
+
         PostDAO.save(generatedUID, newPost.get.copy(id = Some(generatedUID), displayedDate = savedPost.displayedDate, date = savedPost.date))
 
         if (uid != generatedUID) {
           PostDAO.delete(uid)
+          logger.info(s"Post saved with uid [$generatedUID], old post deleted")
+        } else {
+          logger.info(s"Post with uid [$generatedUID] updated")
         }
 
         Right(generatedUID)
@@ -65,11 +104,15 @@ object PostService {
 
   def publishPost(uid: String): Either[String, Boolean] = {
     getPostById(uid) map { post =>
+      logger.info(s"Publishing post with uid [$uid]")
+
       val newPost = post.copy(isDraft = false)
 
       PostDAO.save(uid, newPost)
 
       TagDao.mergeTags(post.tags) //! happens only when post is being published to minimize amount of trash tags
+
+      logger.info(s"Post with uid [$uid] published")
 
       Right(true)
     } getOrElse Left(s"Post with uid: $uid not found!")
@@ -96,21 +139,5 @@ object PostService {
         }
       }
     }
-
-
-//    (pageNum, previews.size <= ViewPage.PageSize) match {
-//      //in the middle
-//      case (Some(page: Int), true) =>
-//        val prev = if(page == 2) "" else s"?page=${page-1}"
-//        ViewPage(previous = Some(sourceURL + prev), next = None)
-//      //last page
-//      case (Some(page: Int), false) =>
-//        val prev = if(page == 2) "" else s"?page=${page-1}"
-//        ViewPage(previous = Some(sourceURL + prev), next = Some(sourceURL+s"?page=${page+1}"))
-//      //no posts around
-//      case (None, true) => ViewPage(previous = None, next = None)
-//      //first page
-//      case (None, false) => ViewPage(previous = None, next = Some(sourceURL+s"?page=2"))
-//    }
   }
 }

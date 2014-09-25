@@ -15,7 +15,11 @@ class TagsController (override implicit val env: RuntimeEnvironment[SocialUser])
 
   def getTagList = SecuredAction {
     implicit request =>
+      logger.info(s"Start reading tag list from DB")
+
       val tags = Await.result(TagDao.getTags, 5 seconds)
+
+      logger.info(s"${tags.size} tags are read from DB")
 
       Ok(Json.toJson(tags))
   }

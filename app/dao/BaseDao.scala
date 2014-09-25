@@ -4,9 +4,6 @@ import db.ReactiveCouchbaseClient
 import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.json.{Reads, Writes}
 
-/**
- * Created by akirillov on 8/14/14.
- */
 trait BaseDao[T] extends ReactiveCouchbaseClient {
 
   def save(key: String, entity: T)(implicit w: Writes[T], ec: ExecutionContext) = {

@@ -7,9 +7,12 @@ import play.api.libs.json.Json
 import domain.ViewPage
 import util.JsonPostTransformer
 import service.PostService
+import play.api.Logger
 
 class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
   extends securesocial.core.SecureSocial[SocialUser] with SecureSocialAuth{
+
+  val logger = Logger("[PostController]")
 
   def index(pageNum: Option[Int]) = UserAwareAction { implicit request =>
     val previews = PostService.getPosts(pageNum)
@@ -19,15 +22,21 @@ class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
   }
 
   def postEditPage(uid: Option[String]) = SecuredAction { implicit request =>
+    logger.info("Entered post edit controller method")
     if(uid.isEmpty){
+      logger.info("Post UID not specified, creating new post")
 
       Ok(views.html.editpost(None, None, None, None)(Some(request.user)))
 
     } else {
 
-      PostService.getPostById(uid.get).fold(
-        BadRequest(s"Post with uid $uid not found!")
-      )({ post =>
+      PostService.getPostById(uid.get).fold {
+        val message = s"Post with uid $uid not found!"
+        logger.error(message)
+        BadRequest(message)
+      }({ post =>
+        val message = s"Post with uid $uid found, processing to edit"
+
         val tags = if (post.tags.isEmpty) None else Some(Json.toJson(post.tags).toString)
 
         Ok(views.html.editpost(post.id, Some(post.title), Some(JsonPostTransformer.buildSirTrevorBlocks(post).toString()), tags)(Some(request.user)))
@@ -37,16 +46,20 @@ class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
   }
 
   def postViewPage(uid: String) = UserAwareAction { implicit request =>
-    PostService.getPostById(uid).fold(
+    PostService.getPostById(uid).fold {
+      logger.error(s"Post with UID [$uid] not found!")
+
       Redirect("/")
-    )({ post =>
+    }({ post =>
       Ok(views.html.post(post)(request.user))
     })
   }
 
   def publishPost(uid: String) = SecuredAction { implicit request =>
     PostService.publishPost(uid) match {
-      case Left(x) => BadRequest(x)
+      case Left(x) =>
+        logger.error(x)
+        BadRequest(x)
       case Right(x) => Redirect("/")
     }
   }
@@ -75,7 +88,9 @@ class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
     implicit request =>
       
       PostService.saveJsonPost(request.body) match {
-        case Left(errorMessage) => BadRequest(Json.obj("status" -> "KO", "message" -> errorMessage))
+        case Left(errorMessage) =>
+          logger.error(errorMessage)
+          BadRequest(Json.obj("status" -> "KO", "message" -> errorMessage))
         case Right(postId) => Ok(Json.obj("status" -> "OK", "pid" -> postId))
       }
       
@@ -85,7 +100,9 @@ class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
     implicit request =>
 
       PostService.updateExistingPost(uid, request.body) match {
-        case Left(errorMessage) => BadRequest(Json.obj("status" -> "KO", "message" -> errorMessage))
+        case Left(errorMessage) =>
+          logger.error(s"Post with UID [$uid] not found!")
+          BadRequest(Json.obj("status" -> "KO", "message" -> errorMessage))
         case Right(postId) => Ok(Json.obj("status" -> "OK", "pid" -> postId))
       }
       
