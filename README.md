@@ -17,6 +17,7 @@ TODO: build, configuration and deployment from checkout to working service. Admi
 Blog-Awesome architecture
 ------
 
+TODO
 
 
 Building & Testing
