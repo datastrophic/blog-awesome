@@ -35,6 +35,9 @@
                             <a href="/post/@preview.id">@preview.title</a>
                         </h1>
                         <p><small>
+                            @if(!preview.tags.isEmpty){
+                                <i class="fa fa-tags"></i>
+                            }
                             @for(tag <- preview.tags){
                                 <a href="/post/tag/@tag" class="label label-default">@tag</a>
                             }

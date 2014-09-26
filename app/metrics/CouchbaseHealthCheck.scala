@@ -32,6 +32,9 @@ object CouchbaseHealthCheck extends HealthCheck with ReactiveCouchbaseClient{
       }
 
     } catch {
+      case e: IllegalStateException =>
+        createKeyIfNotExists()
+        HealthCheck.Result.unhealthy(e.getMessage)
       case t: Throwable =>
         logger.error("Error during healthcheck", t)
         HealthCheck.Result.unhealthy(t.getMessage)
@@ -39,6 +42,7 @@ object CouchbaseHealthCheck extends HealthCheck with ReactiveCouchbaseClient{
   }
 
   def createKeyIfNotExists() = {
+    logger.info(s"Creating healthcheck key [$HealthCheckKey]")
     val result = Await.result(
         executeWithBucket {
           bucket => bucket.get[Int](HealthCheckKey)

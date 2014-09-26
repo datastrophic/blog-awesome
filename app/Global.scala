@@ -69,8 +69,6 @@ object Global extends GlobalSettings{
   override def onStart(app: Application): Unit = {
     super.onStart(app)
 
-    CouchbaseHealthCheck.createKeyIfNotExists()
-
     val healthCheckActor = Akka.system.actorOf(Props[HealthCheckActor], name = "healthCheckActor")
     Akka.system.scheduler.schedule(0 micro, 10 seconds, healthCheckActor, "tick")
   }

@@ -23,6 +23,9 @@
                         <h1>@post.title</h1>
                             <!-- Date/Time -->
                         <p><small>
+                        @if(!post.tags.isEmpty){
+                            <i class="fa fa-tags"></i>
+                        }
                         @for(tag <- post.tags){
                             <a href="/post/tag/@tag" class="label label-default">@tag</a>
                         }
