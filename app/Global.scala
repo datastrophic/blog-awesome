@@ -15,13 +15,18 @@
  *
  */
 
+import akka.actor.Props
 import auth.{SocialUserService, SocialUser, CustomEventListener}
-import play.api.GlobalSettings
+import metrics.{CouchbaseHealthCheck, HealthCheckActor}
+import play.api.{Application, GlobalSettings}
 import play.api.mvc._
+import play.libs.Akka
 import scala.concurrent.Future
 import play.api.mvc.Results._
 import java.lang.reflect.Constructor
 import securesocial.core.RuntimeEnvironment
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object Global extends GlobalSettings{
 
@@ -59,5 +64,14 @@ object Global extends GlobalSettings{
     Future.successful(
       NotFound(views.html.notfound(None))
     )
+  }
+
+  override def onStart(app: Application): Unit = {
+    super.onStart(app)
+
+    CouchbaseHealthCheck.createKeyIfNotExists()
+
+    val healthCheckActor = Akka.system.actorOf(Props[HealthCheckActor], name = "healthCheckActor")
+    Akka.system.scheduler.schedule(0 micro, 10 seconds, healthCheckActor, "tick")
   }
 }

@@ -2,6 +2,7 @@ import play.api.Logger
 import play.api.mvc.{Result, RequestHeader, Filter}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import metrics.ApplicationMetrics._
 
 object AccessLoggingFilter extends Filter {
 
@@ -12,8 +13,11 @@ object AccessLoggingFilter extends Filter {
 
     resultFuture.foreach(result => {
       if(!isAsset(request.uri)) {
+        httpRequests.mark()
+
         val msg = s"method=${request.method} uri=${request.uri} remote-address=${request.remoteAddress}" +
           s" status=${result.header.status}"
+
         accessLogger.info(msg)
       }
     })

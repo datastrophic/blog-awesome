@@ -43,7 +43,9 @@ libraryDependencies ++= Seq(
     "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3",
     "com.sksamuel.scrimage" %% "scrimage-core" % "1.3.20",
     "com.sksamuel.scrimage" %% "scrimage-filters" % "1.3.20",
-    "org.scalatestplus" %% "play" % "1.1.0"
+    "org.scalatestplus" %% "play" % "1.1.0",
+    "com.codahale.metrics" % "metrics-core" % "3.0.1",
+    "com.codahale.metrics" % "metrics-healthchecks" % "3.0.1"
 )
 
 instrumentSettings

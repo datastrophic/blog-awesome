@@ -8,6 +8,7 @@ import play.api.libs.json.JsValue
 import util.{StringAndDateUtils, JsonPostTransformer}
 import java.util.Date
 import play.api.Logger
+import metrics.ApplicationMetrics._
 
 object PostService {
 
@@ -15,35 +16,53 @@ object PostService {
 
   def getPostById(uid: String): Option[Post] = {
     logger.info(s"Attempting to get post by id [$uid]")
+    val context = couchbaseReadTime.time()
 
     val post = Await.result(PostDAO.get(uid), 5 seconds)
 
     logger.info(s"Post lookup by id [$uid] found: ${post.isDefined}")
+    couchbaseReadRequests.mark()
+    context.stop()
 
     post
   }
 
   def getPosts(pageNum: Option[Int]): List[PostPreview] = {
     logger.info(s"Attempting to get published posts page #${pageNum.getOrElse(1)}")
+    val context = couchbaseMRTime.time()
+
     val previews = getPostPreviews(PostDAO.findSubmittedPosts(pageNum.getOrElse(1)))
 
     logger.info(s"${previews.size} published posts found for page #${pageNum.getOrElse(1)}")
+    couchbaseMRRequests.mark()
+    context.stop()
+
     previews
   }
 
   def getDrafts(pageNum: Option[Int]): List[PostPreview] = {
     logger.info(s"Attempting to get drafts page #${pageNum.getOrElse(1)}")
+    val context = couchbaseMRTime.time()
+
     val previews = getPostPreviews(PostDAO.findDrafts(pageNum.getOrElse(1)))
 
     logger.info(s"${previews.size} drafts found for page #${pageNum.getOrElse(1)}")
+    couchbaseMRRequests.mark()
+    context.stop()
+
     previews
   }
 
   def getPostsByTag(tag: String, pageNum: Option[Int]): List[PostPreview] = {
     logger.info(s"Attempting to get posts by tag [$tag], page #${pageNum.getOrElse(1)}")
+    val context = couchbaseMRTime.time()
+
     val previews = getPostPreviews(PostDAO.findPostsByTag(tag, pageNum.getOrElse(1)))
 
     logger.info(s"${previews.size} posts with tag [$tag] found for page #${pageNum.getOrElse(1)}")
+    couchbaseMRRequests.mark()
+    context.stop()
+
     previews
   }
 
@@ -63,6 +82,7 @@ object PostService {
 
     newPost map { p =>
       logger.info("JSON parsed successfully")
+      val context = couchbaseWriteTime.time()
 
       val generatedUID = StringAndDateUtils.generateUID(p.title)
       val dateAsMillis = new Date().getTime
@@ -70,6 +90,8 @@ object PostService {
       PostDAO.save(generatedUID, newPost.get.copy(id = Some(generatedUID), isDraft = true, displayedDate = StringAndDateUtils.getCurrentDateAsString, date = dateAsMillis))
 
       logger.info(s"Post saved with uid [$generatedUID]")
+      couchbaseWriteRequests.mark()
+      context.stop()
 
       Right(generatedUID)
     } getOrElse Left(s"Json hasn't been parsed correctly:\n${json.toString}")
@@ -82,6 +104,7 @@ object PostService {
 
     newPost map { p =>
       logger.info("JSON parsed successfully")
+      val context = couchbaseWriteTime.time()
 
       val generatedUID = StringAndDateUtils.generateUID(p.title)
 
@@ -97,6 +120,9 @@ object PostService {
           logger.info(s"Post with uid [$generatedUID] updated")
         }
 
+        couchbaseWriteRequests.mark()
+        context.stop()
+
         Right(generatedUID)
       } getOrElse Left(s"Post with uid:${uid.trim} not found!")
     } getOrElse Left(s"Json hasn't been parsed correctly:\n${json.toString}")
@@ -105,6 +131,7 @@ object PostService {
   def publishPost(uid: String): Either[String, Boolean] = {
     getPostById(uid) map { post =>
       logger.info(s"Publishing post with uid [$uid]")
+      val context = couchbaseWriteTime.time()
 
       val newPost = post.copy(isDraft = false)
 
@@ -113,6 +140,8 @@ object PostService {
       TagDao.mergeTags(post.tags) //! happens only when post is being published to minimize amount of trash tags
 
       logger.info(s"Post with uid [$uid] published")
+      couchbaseWriteRequests.mark()
+      context.stop()
 
       Right(true)
     } getOrElse Left(s"Post with uid: $uid not found!")

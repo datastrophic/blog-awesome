@@ -8,6 +8,7 @@ import domain.ViewPage
 import util.JsonPostTransformer
 import service.PostService
 import play.api.Logger
+import metrics.ApplicationMetrics._
 
 class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
   extends securesocial.core.SecureSocial[SocialUser] with SecureSocialAuth{
@@ -15,8 +16,12 @@ class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
   val logger = Logger("[PostController]")
 
   def index(pageNum: Option[Int]) = UserAwareAction { implicit request =>
+    val context = postListReadTime.time()
+
     val previews = PostService.getPosts(pageNum)
     val postPage = PostService.createViewPage("/", previews, pageNum)
+
+    context.stop()
 
     Ok(views.html.index(request.user)(previews.take(ViewPage.PageSize), postPage))
   }
@@ -46,11 +51,16 @@ class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
   }
 
   def postViewPage(uid: String) = UserAwareAction { implicit request =>
+    val context = singlePostReadTime.time()
+
     PostService.getPostById(uid).fold {
       logger.error(s"Post with UID [$uid] not found!")
+      context.stop()
 
       Redirect("/")
     }({ post =>
+      context.stop()
+
       Ok(views.html.post(post)(request.user))
     })
   }
@@ -70,17 +80,22 @@ class PostController(override implicit val env: RuntimeEnvironment[SocialUser])
   }
 
   def getDraftsPage(pageNum: Option[Int]) = SecuredAction { implicit request =>
+    val context = postListReadTime.time()
+
     val previews = PostService.getDrafts(pageNum)
     val postPage = PostService.createViewPage("/drafts", previews, pageNum)
-    
+
+    context.stop()
     Ok(views.html.index(Some(request.user))(previews.take(ViewPage.PageSize), postPage))
   }
 
 
   def getPostsByTag(tag: String, pageNum: Option[Int]) = UserAwareAction { implicit request =>
+    val context = postListReadTime.time()
     val previews = PostService.getPostsByTag(tag, pageNum)
     val postPage = PostService.createViewPage(s"/post/tag/$tag", previews, pageNum)
 
+    context.stop()
     Ok(views.html.index(request.user)(previews.take(ViewPage.PageSize), postPage))
   }
   
