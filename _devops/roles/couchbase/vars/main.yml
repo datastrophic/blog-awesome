@@ -23,3 +23,13 @@ buckets:
     ram_quota: 256
     replica_number: 0
     enable_flush: 1
+
+design_docs:
+  - docname: octopus_mr
+    file: mr_views.json
+    buckets:
+      - octopus
+  - docname: test_mr
+    file: mr_views.json
+    buckets:
+      - test

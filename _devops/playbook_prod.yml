@@ -13,4 +13,3 @@
     - role: nginx
     - role: datadog
     - role: appdeploy
-

@@ -36,3 +36,17 @@
   shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket={{ item.value.name }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ item.value.ram_quota }}  --bucket-replica={{ item.value.replica_number }} -u {{ admin_user }} -p {{ admin_password }} --enable-flush={{ item.value.enable_flush }}
   with_dict: buckets
   when: couchbaseInstalled.stdout == '0'
+
+- name: Copying Views
+  copy: src={{ item }} dest=/tmp/couchbase/views/
+  with_fileglob:
+        - views/*.json
+  when: couchbaseInstalled.stdout == '0'
+
+
+- name: Uploading views
+  shell: "curl -X PUT -H 'Content-Type: application/json' http://{{ admin_user }}:{{ admin_password }}@localhost:8092/{{ item.1 }}/_design/{{ item.0.docname }} -d @/tmp/couchbase/views/{{ item.0.file }}"
+  with_subelements:
+       - design_docs
+       - buckets
+  when: couchbaseInstalled.stdout == '0'

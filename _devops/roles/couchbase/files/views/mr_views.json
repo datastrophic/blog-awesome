@@ -1,0 +1,12 @@
+{
+    "views" : {
+        "by_tag" : {
+            "map" : "function (doc, meta) {\n   if (doc.tags && doc.date && !doc.isDraft) {\n   for (var idx in doc.tags) {\n   emit([doc.tags[idx], doc.date], null);\n } \n }\n }"
+        },
+        "by_draft" : {
+            "map" : "function (doc, meta) {\n   if (doc.date) {\n   emit([doc.isDraft, doc.date], null);\n } \n}"
+        }
+    }
+}
+
+
