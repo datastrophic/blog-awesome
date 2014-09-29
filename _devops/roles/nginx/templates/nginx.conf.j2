@@ -1,0 +1,38 @@
+http {
+
+	server_names_hash_bucket_size 64;
+
+	server {
+	    server_name  www.{{ domain_name }};
+	    rewrite ^(.*) http://{{ domain_name }}$1 permanent;
+	}
+
+    server {
+        listen 80;
+        server_name cutesy.me;
+
+
+        # all requests will be redirected to {{ app_data_dir }}/images/../..
+        location /images/ {
+           root {{ app_data_dir }};
+        }
+
+
+        # if file not found in static content it will be acquired from backend
+        location / {
+          try_files $uri @proxy;
+        }
+
+        # Play Server
+        location @proxy {
+            proxy_pass  http://localhost:9000;
+            proxy_redirect off;
+            proxy_buffering off;
+
+            #send protocol info to play server
+            proxy_set_header        Host               $host;
+            proxy_set_header        X-Real-IP          $remote_addr;
+        }
+
+    }
+}

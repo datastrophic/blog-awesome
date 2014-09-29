@@ -1,0 +1,18 @@
+init_config:
+
+instances:
+  - conf:
+    - include:
+        domain: java.lang
+        type: MemoryPool
+    - include:
+        domain: java.lang
+        type: Threading
+    - include:
+        domain: java.lang
+        type: ClassLoading
+    - include:
+        domain: {{ app_metrics_domain }}
+    host: localhost
+    port: 9010
+    name: blog-awesome

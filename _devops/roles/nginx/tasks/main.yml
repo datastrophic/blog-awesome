@@ -1,0 +1,8 @@
+- name: Install nginx
+  apt: name=nginx state=present
+
+- name: Copy nginx configuration for Cutesy
+  action: template src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+- name: Restarting nginx
+  shell: service nginx restart

@@ -27,6 +27,12 @@
   shell: /opt/couchbase/bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u {{ admin_user }} -p {{ admin_password }}
   when: couchbaseInstalled.stdout == '0'
 
-- name: create bucket {{ bucket_name }} with {{ num_replicas }} replicas
-  shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket={{ bucket_name }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ bucket_ram_quota }}  --bucket-replica={{ num_replicas }} -u {{ admin_user }} -p {{ admin_password }}
+- name: Reading buckets configuration
+  debug: msg="Bucket {{ item.key }} [ name = {{ item.value.name }}, ram_quota = {{ item.value.ram_quota }}, replica_number = {{ item.value.replica_number }}, enable_flush = {{ item.value.enable_flush }} ] found in configuration"
+  with_dict: buckets
+  when: couchbaseInstalled.stdout == '0'
+
+- name: Creating Buckets
+  shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket={{ item.value.name }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ item.value.ram_quota }}  --bucket-replica={{ item.value.replica_number }} -u {{ admin_user }} -p {{ admin_password }} --enable-flush={{ item.value.enable_flush }}
+  with_dict: buckets
   when: couchbaseInstalled.stdout == '0'

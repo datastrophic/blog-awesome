@@ -11,3 +11,15 @@ webapp_ram: 1024
 bucket_name: octopus
 bucket_ram_quota: 512
 num_replicas: 0
+
+buckets:
+  octopus:
+    name: octopus
+    ram_quota: 512
+    replica_number: 0
+    enable_flush: 0
+  test:
+    name: test
+    ram_quota: 256
+    replica_number: 0
+    enable_flush: 1

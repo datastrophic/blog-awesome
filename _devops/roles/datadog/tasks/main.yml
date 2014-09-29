@@ -1,0 +1,15 @@
+- name: Check Datadog Installed
+  shell: dpkg -l | grep -cim1 datadog-agent
+  register: ddAgentInstalled
+  ignore_errors: True
+
+- name: Setup DataDog Agent
+  shell: DD_API_KEY=4ec5c50be848bb1e955395c239371a87 bash -c "$(wget -qO- http://dtdg.co/agent-install-ubuntu)"
+  when: ddAgentInstalled.stdout == '0'
+
+- name: Create shell script for configuring main node
+  action: template src=templates/datadog.jmx.yaml.j2 dest=/etc/dd-agent/conf.d/jmx.yaml owner=dd-agent group=root
+  when: ddAgentInstalled.stdout == '0'
+
+- name: Restart Agent
+  shell: service datadog-agent restart

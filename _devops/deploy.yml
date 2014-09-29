@@ -1,0 +1,16 @@
+---
+
+- hosts: all
+  sudo: True
+  roles:
+    - role: common
+    - role: oracle-java
+    - role: couchbase
+
+- hosts: webapp
+  sudo: True
+  roles:
+    - role: nginx
+    - role: datadog
+    - role: appdeploy
+

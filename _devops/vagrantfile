@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  base_box = "precise64_2"
+  base_box = "ubuntu/trusty64"
 
   config.vm.define :master do |master|
     master.vm.box = base_box
@@ -15,5 +15,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     master.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--memory", "4096"]
     end
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "devplaybook.yml"
   end
 end

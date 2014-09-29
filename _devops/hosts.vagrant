@@ -1,9 +1,0 @@
-[master]
-192.168.100.10
-
-[master:vars]
-ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
-ansible_ssh_user=vagrant
-ansible_ssh_port=22
-
-[couchbase-nodes]
