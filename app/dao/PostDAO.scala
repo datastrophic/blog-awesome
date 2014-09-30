@@ -27,7 +27,7 @@ object PostDAO extends BaseDao[Post]{
         .setSkip(ViewPage.PageSize * (pageNum-1))
         .setStale(Stale.FALSE)
 
-        bucket.find[Post]("doc", "by_tag")(query)
+        bucket.find[Post]("octopus_mr", "by_tag")(query)
     })
   }
 
@@ -48,7 +48,7 @@ object PostDAO extends BaseDao[Post]{
         .setSkip(ViewPage.PageSize * (pageNum-1))
         .setStale(Stale.FALSE)
 
-      bucket.find[Post]("doc", "by_draft")(query)
+      bucket.find[Post]("octopus_mr", "by_draft")(query)
     })
   }
 

@@ -1,8 +1,10 @@
 import play.PlayScala
 
-name := """myawesomeblog"""
+name := """blog-awesome"""
 
-version := "1.0-SNAPSHOT"
+version := "1.0"
+
+name in Universal := "blog-awesome"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 

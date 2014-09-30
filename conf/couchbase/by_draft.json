@@ -1,5 +1,0 @@
-function (doc, meta) {
-    if(doc.date){
-        emit([doc.isDraft, doc.date], null);
-    }
-}

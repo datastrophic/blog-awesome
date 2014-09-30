@@ -1,5 +1,5 @@
 - name: Copy zip
-  unarchive: src=../../../target/universal/{{ dist_name }}.zip dest=/tmp/
+  unarchive: src=../../../../target/universal/{{ dist_name }}.zip dest=/tmp/
 
 - name: Kill Running Process
   action: shell sudo kill -9 $(cat {{ application_home }}/RUNNING_PID)
@@ -11,19 +11,16 @@
     - "{{ application_home }}"
     - play.*
 
-- name: Make home dir
-  shell: mkdir {{ application_home }}
-
 - name: Moving to application HOME
-  shell: mv -f /tmp/{{ dist_name }}/* {{ application_home }}
+  shell: mkdir {{ application_home }}; mv -f /tmp/{{ dist_name }}/* {{ application_home }}
 
 - name: Create shell script for launching the App
-  action: template src=templates/startcutesy.sh.j2 dest={{ cutesy_home }}/bin/startcutesy.sh mode=750
+  action: template src=templates/launch.sh.j2 dest={{ application_home }}/bin/launch.sh mode=750
 
 - name: Copying SecureSocial configuration (overwrite)
-  action: template src=templates/ssprod.conf.j2 dest={{ cutesy_home }}/conf/production/ssprod.conf
+  action: template src=templates/ssprod.conf.j2 dest={{ application_home }}/conf/production/ssprod.conf
 
-- name: Launch cutesy App
-  action: shell nohup {{ cutesy_home }}/bin/startcutesy.sh
+- name: Launch Awesomeness
+  action: shell nohup {{ application_home }}/bin/launch.sh
   async: 1000000
   poll: 0

@@ -9,7 +9,23 @@
 
 - hosts: webapp
   sudo: True
+  vars_prompt:
+      redeploy: Full redeploy or application only [full|app] ?
   roles:
-    - role: nginx
-    - role: datadog
-    - role: appdeploy
+    - {
+        role: nginx,
+        domain_name: flyingoctopus.io,
+        app_data_dir: /opt/octopus,
+        when: "redeploy == 'full'"
+      }
+    - {
+        role: datadog,
+        datadog_api_key: 4ec5c50be848bb1e955395c239371a87,
+        app_metrics_domain: "fo.blog",
+        when: "redeploy == 'full'"
+      }
+    - {
+        role: appdeploy,
+        dist_name: blog-awesome,
+        webapp_ram: 512
+      }

@@ -41,7 +41,7 @@
   copy: src={{ item }} dest=/tmp/couchbase/views/
   with_fileglob:
         - views/*.json
-  when: couchbaseInstalled.stdout == '0'
+#  when: couchbaseInstalled.stdout == '0'
 
 
 - name: Uploading views
@@ -49,4 +49,4 @@
   with_subelements:
        - design_docs
        - buckets
-  when: couchbaseInstalled.stdout == '0'
+#  when: couchbaseInstalled.stdout == '0'

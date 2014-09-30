@@ -29,7 +29,7 @@ design_docs:
     file: mr_views.json
     buckets:
       - octopus
-  - docname: test_mr
+  - docname: octopus_mr
     file: mr_views.json
     buckets:
       - test
