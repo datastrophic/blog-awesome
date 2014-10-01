@@ -1,0 +1,4 @@
+#Monitoring with DataDog
+datadog:
+  datadog_api_key: 4ec5c50be848bb1e955395c239371a87
+  app_metrics_domain: "metrics"

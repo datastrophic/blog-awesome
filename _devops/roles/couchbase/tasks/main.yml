@@ -13,29 +13,29 @@
 
 - name: Configure main node
   shell: /opt/couchbase/bin/couchbase-cli cluster-init -c 127.0.0.1:8091  --cluster-init-username={{ admin_user }} --cluster-init-password={{ admin_password }} --cluster-init-port=8091 --cluster-init-ramsize={{ cluster_ram_quota }}
-  when: couchbaseInstalled.stdout == '0'
+#  when: couchbaseInstalled.stdout == '0'
 
 - name: Create shell script for configuring main node
   template: src=couchbase-add-node.j2 dest=/tmp/addnodes.sh mode=750
-  when: couchbaseInstalled.stdout == '0'
+#  when: couchbaseInstalled.stdout == '0'
 
 - name: Launch config script
   action: shell /tmp/addnodes.sh
-  when: couchbaseInstalled.stdout == '0'
+#  when: couchbaseInstalled.stdout == '0'
 
 - name: Rebalance the cluster
   shell: /opt/couchbase/bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u {{ admin_user }} -p {{ admin_password }}
-  when: couchbaseInstalled.stdout == '0'
+#  when: couchbaseInstalled.stdout == '0'
 
-- name: Reading buckets configuration
-  debug: msg="Bucket {{ item.key }} [ name = {{ item.value.name }}, ram_quota = {{ item.value.ram_quota }}, replica_number = {{ item.value.replica_number }}, enable_flush = {{ item.value.enable_flush }} ] found in configuration"
-  with_dict: buckets
-  when: couchbaseInstalled.stdout == '0'
+#- name: Reading buckets configuration
+#  debug: msg="Bucket {{ item.key }} [ name = {{ item.value.name }}, ram_quota = {{ item.value.ram_quota }}, replica_number = {{ item.value.replica_number }}, enable_flush = {{ item.value.enable_flush }} ] found in configuration"
+#  with_dict: buckets
+#  when: couchbaseInstalled.stdout == '0'
 
 - name: Creating Buckets
   shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket={{ item.value.name }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ item.value.ram_quota }}  --bucket-replica={{ item.value.replica_number }} -u {{ admin_user }} -p {{ admin_password }} --enable-flush={{ item.value.enable_flush }}
   with_dict: buckets
-  when: couchbaseInstalled.stdout == '0'
+#  when: couchbaseInstalled.stdout == '0'
 
 - name: Copying Views
   copy: src={{ item }} dest=/tmp/couchbase/views/

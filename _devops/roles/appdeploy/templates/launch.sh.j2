@@ -3,4 +3,8 @@
 #This file MUST be used as a startup script for application because it contains
 #all the extra JVM and JMX parameters needed for configurable tuning
 
-{{ application_home }}/bin/blog-awesome -mem {{ webapp_ram }} -J-server -J-Dconfig.resource=production/production.conf -J-Dcom.sun.management.jmxremote -J-Dcom.sun.management.jmxremote.port={{ jmx_port }} -J-Djava.rmi.server.hostname=localhost -J-Dcom.sun.management.jmxremote.ssl=false -J-Dcom.sun.management.jmxremote.authenticate=false &
+{{ application.application_home }}/bin/blog-awesome -mem {{ application.webapp_ram }} \
+    -J-server -J-Dconfig.resource=production/production.conf -J-Dcom.sun.management.jmxremote \
+    -J-Dcom.sun.management.jmxremote.port={{ application.jmx_port }} \
+    -J-Djava.rmi.server.hostname=localhost -J-Dcom.sun.management.jmxremote.ssl=false \
+    -J-Dcom.sun.management.jmxremote.authenticate=false &

@@ -1,0 +1,24 @@
+couchbase {
+  actorctx {
+    timeout=10000
+    execution-context {
+      fork-join-executor {
+        parallelism-factor = 4.0
+        parallelism-max = 40
+      }
+    }
+  }
+
+  buckets = [
+  {% for bucket in application.buckets %}
+  {
+    host="{{ application.couchbase_host }}"
+    port="8091"
+    base="pools"
+    bucket="{{ application.bucket }}"
+    user="{{ admin_user }}"
+    pass="{{ admin_password }}"
+  }
+  {% endfor %}
+  ]
+}

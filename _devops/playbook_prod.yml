@@ -1,31 +1,25 @@
 ---
 
-- hosts: all
-  sudo: True
-  roles:
-    - role: common
-    - role: oracle-java
-    - role: couchbase
+#- hosts: all
+#  sudo: True
+#  vars_files:
+#    - config/couchbase.yml
+#  roles:
+#    - role: common
+#    - role: oracle-java
+#    - role: couchbase
 
 - hosts: webapp
   sudo: True
   vars_prompt:
       redeploy: Full redeploy or application only [full|app] ?
+  vars_files:
+    - config/couchbase.yml
+    - config/application.yml
+    - config/datadog.yml
+    - config/nginx.yml
+    - config/securesocial.yml
   roles:
-    - {
-        role: nginx,
-        domain_name: flyingoctopus.io,
-        app_data_dir: /opt/octopus,
-        when: "redeploy == 'full'"
-      }
-    - {
-        role: datadog,
-        datadog_api_key: 4ec5c50be848bb1e955395c239371a87,
-        app_metrics_domain: "fo.blog",
-        when: "redeploy == 'full'"
-      }
-    - {
-        role: appdeploy,
-        dist_name: blog-awesome,
-        webapp_ram: 512
-      }
+    - { role: nginx, when: "redeploy != 'app'" }
+    - role: appdeploy
+    - { role: datadog, when: "redeploy != 'app'" }

@@ -6,10 +6,6 @@ import com.codahale.metrics.health.HealthCheckRegistry
 object ApplicationMetrics {
 
   val metricRegistry = new MetricRegistry
-  val healthChecks = new HealthCheckRegistry
-
-  val jmxReporter = JmxReporter.forRegistry(metricRegistry).build()
-  jmxReporter.start()
 
   //http
   val httpRequests = metricRegistry.meter("fo.blog.http.requests")
@@ -22,7 +18,6 @@ object ApplicationMetrics {
   val couchbaseReadTime = metricRegistry.timer("fo.blog.couchbase.read.time")
   val couchbaseWriteTime = metricRegistry.timer("fo.blog.couchbase.write.time")
   val couchbaseMRTime = metricRegistry.timer("fo.blog.couchbase.MR.time")
-
 
   //logic
   val postListReadTime = metricRegistry.timer("fo.blog.posts.list.generation.time")

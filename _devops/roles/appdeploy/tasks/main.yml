@@ -1,26 +1,26 @@
 - name: Copy zip
-  unarchive: src=../../../../target/universal/{{ dist_name }}.zip dest=/tmp/
+  unarchive: src=../../../../target/universal/{{ application.dist_name }}.zip dest=/tmp/
 
 - name: Kill Running Process
-  action: shell sudo kill -9 $(cat {{ application_home }}/RUNNING_PID)
+  action: shell sudo kill -9 $(cat {{ application.application_home }}/RUNNING_PID)
   ignore_errors: True
 
 - name: Clear previous install
   action: file path={{ item }} state=absent
   with_items:
-    - "{{ application_home }}"
+    - "{{ application.application_home }}"
     - play.*
 
 - name: Moving to application HOME
-  shell: mkdir {{ application_home }}; mv -f /tmp/{{ dist_name }}/* {{ application_home }}
+  shell: mkdir -p {{ application.application_home }}; mv -f /tmp/{{ application.dist_name }}/* {{ application.application_home }}
 
 - name: Create shell script for launching the App
-  action: template src=templates/launch.sh.j2 dest={{ application_home }}/bin/launch.sh mode=750
+  action: template src=launch.sh.j2 dest={{ application.application_home }}/bin/launch.sh mode=755
 
 - name: Copying SecureSocial configuration (overwrite)
-  action: template src=templates/ssprod.conf.j2 dest={{ application_home }}/conf/production/ssprod.conf
+  action: template src=securesocial.conf.j2 dest={{ application.application_home }}/conf/production/securesocial.conf
 
 - name: Launch Awesomeness
-  action: shell nohup {{ application_home }}/bin/launch.sh
+  action: shell nohup {{ application.application_home }}/bin/launch.sh
   async: 1000000
   poll: 0

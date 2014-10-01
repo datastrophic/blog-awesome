@@ -4,12 +4,12 @@
   ignore_errors: True
 
 - name: Setup DataDog Agent
-  shell: DD_API_KEY={{ datadog_api_key }} bash -c "$(wget -qO- http://dtdg.co/agent-install-ubuntu)"
+  shell: DD_API_KEY={{ datadog.datadog_api_key }} bash -c "$(wget -qO- http://dtdg.co/agent-install-ubuntu)"
   when: ddAgentInstalled.stdout == '0'
 
-- name: Create shell script for configuring main node
+- name: Copy JMX agent configuration
   action: template src=datadog.jmx.yaml.j2 dest=/etc/dd-agent/conf.d/jmx.yaml owner=dd-agent group=root
-  when: ddAgentInstalled.stdout == '0'
+#  when: ddAgentInstalled.stdout == '0'
 
 - name: Restart Agent
   shell: service datadog-agent restart

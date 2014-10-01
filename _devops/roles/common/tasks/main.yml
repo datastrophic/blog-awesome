@@ -12,3 +12,4 @@
     - libssl0.9.8
     - unzip
     - tree
+    - htop

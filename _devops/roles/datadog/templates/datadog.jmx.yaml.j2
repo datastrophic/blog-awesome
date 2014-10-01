@@ -12,7 +12,7 @@ instances:
         domain: java.lang
         type: ClassLoading
     - include:
-        domain: {{ app_metrics_domain }}
+        domain: {{ datadog.app_metrics_domain }}
     host: localhost
-    port: 9010
+    port: {{ application.jmx_port }}
     name: blog-awesome
