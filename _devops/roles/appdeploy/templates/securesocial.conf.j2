@@ -124,15 +124,19 @@ securesocial {
 		requestTokenUrl="https://twitter.com/oauth/request_token"
 		accessTokenUrl="https://twitter.com/oauth/access_token"
 		authorizationUrl="https://twitter.com/oauth/authenticate"
-		consumerKey={% if securesocial.twitter is defined %}securesocial.twitter.id{% endif %}
-		consumerSecret={% if securesocial.twitter is defined %}securesocial.twitter.secret{% endif %}
+		consumerKey={% if securesocial.twitter is defined %}{{ securesocial.twitter.id }}{% endif %}
+
+		consumerSecret={% if securesocial.twitter is defined %}{{ securesocial.twitter.secret }}{% endif %}
+
 	}
 
     facebook {
         authorizationUrl="https://graph.facebook.com/oauth/authorize"
         accessTokenUrl="https://graph.facebook.com/oauth/access_token"
-        clientId={% if securesocial.facebook is defined %}securesocial.facebook.id{% endif %}
-        clientSecret={% if securesocial.facebook is defined %}securesocial.facebook.secret{% endif %}
+        clientId={% if securesocial.facebook is defined %} {{ securesocial.facebook.id }} {% endif %}
+
+        clientSecret={% if securesocial.facebook is defined %} {{ securesocial.facebook.secret }}{% endif %}
+
         # this scope is the minimum SecureSocial requires.  You can add more if required by your app.
         scope=email
     }

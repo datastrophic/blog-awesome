@@ -4,7 +4,7 @@
 #all the extra JVM and JMX parameters needed for configurable tuning
 
 {{ application.application_home }}/bin/blog-awesome -mem {{ application.webapp_ram }} \
-    -J-server -J-Dconfig.resource=production/production.conf -J-Dcom.sun.management.jmxremote \
+    -J-server -J-Dconfig.file={{ application.application_home }}/conf/application.conf -J-Dcom.sun.management.jmxremote \
     -J-Dcom.sun.management.jmxremote.port={{ application.jmx_port }} \
     -J-Djava.rmi.server.hostname=localhost -J-Dcom.sun.management.jmxremote.ssl=false \
     -J-Dcom.sun.management.jmxremote.authenticate=false &

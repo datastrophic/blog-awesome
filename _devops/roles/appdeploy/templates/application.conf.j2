@@ -3,7 +3,7 @@
 application.secret="`YKEwEgw/pH]/R2tD<G:SivRv0OmYSGo1@]6[QkL/jcJmZxPoq<EsZWm0=SZTGF>"
 application.langs="en"
 
-current.host = "http://localhost:9000"
+current.host = "http://{{ nginx.domain_name }}"
 
 #only in prod
 image.system.path = "/opt/octopus/data/images"
@@ -18,7 +18,7 @@ image.system.path = "/opt/octopus/data/images"
 # You can also configure logback (http://logback.qos.ch/),
 # by providing an application-logger.xml file in the conf directory.
 
-couchbase.default.bucket=octopus
+couchbase.default.bucket={{ application.default_bucket }}
 
 include "couchbase.conf"
 include "securesocial.conf"

@@ -1,13 +1,13 @@
 ---
 
-#- hosts: all
-#  sudo: True
-#  vars_files:
-#    - config/couchbase.yml
-#  roles:
-#    - role: common
-#    - role: oracle-java
-#    - role: couchbase
+- hosts: all
+  sudo: True
+  vars_files:
+    - config/couchbase.yml
+  roles:
+    - role: common
+    - role: oracle-java
+    - role: couchbase
 
 - hosts: webapp
   sudo: True

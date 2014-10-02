@@ -1,0 +1,25 @@
+---
+
+#- hosts: all
+#  sudo: True
+#  vars_files:
+#    - prodconfig/flyingoctopus/couchbase.yml
+#  roles:
+#    - role: common
+#    - role: oracle-java
+#    - role: couchbase
+
+- hosts: webapp
+  sudo: True
+  vars_prompt:
+      redeploy: Full redeploy or application only [full|app] ?
+  vars_files:
+    - prodconfig/flyingoctopus/couchbase.yml
+    - prodconfig/flyingoctopus/application.yml
+    - prodconfig/flyingoctopus/datadog.yml
+    - prodconfig/flyingoctopus/nginx.yml
+    - prodconfig/flyingoctopus/securesocial.yml
+  roles:
+    - { role: nginx, when: "redeploy != 'app'" }
+    - role: appdeploy
+    - { role: datadog, when: "redeploy != 'app'" }

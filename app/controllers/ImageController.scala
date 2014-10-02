@@ -22,7 +22,12 @@ class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]
   private val config = ConfigFactory.load()
 
   private val currentHost: String = config.getString("current.host")
-  private val imageFolder: String = config.getString("image.system.path")
+  private def imageFolder: String = {
+    val confPath = config.getString("image.system.path")
+
+    if(confPath.endsWith("/")) confPath
+    else s"$confPath/"
+  }
 
   val pathPrefix = if (Play.isProd) s"$imageFolder" else s"/tmp/playblog"
 
@@ -39,11 +44,10 @@ class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]
   private def saveUploadedImage(filePart: FilePart[TemporaryFile]): String = {
     logger.info("Saving image")
     val fileName = generateNewFileName(filePart.filename)
-    val path = s"images/$fileName"
 
-    saveImage(filePart, path)
+    saveImage(filePart, fileName)
 
-    val url = s"$currentHost/$path"
+    val url = s"$currentHost/images/$fileName"
     logger.info(s"Image saved, generated url: $url")
     url
   }

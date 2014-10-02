@@ -13,6 +13,6 @@ instances:
         type: ClassLoading
     - include:
         domain: {{ datadog.app_metrics_domain }}
-    host: localhost
+    host: {{ ansible_hostname }}
     port: {{ application.jmx_port }}
     name: blog-awesome

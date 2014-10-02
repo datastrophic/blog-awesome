@@ -1,42 +1,14 @@
-/**
- * Copyright 2014 Jorge Aliss (jaliss at gmail dot com) - twitter: @jaliss
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
-import akka.actor.Props
 import auth.{SocialUserService, SocialUser, CustomEventListener}
-import com.codahale.metrics.{MetricFilter, JmxReporter}
-import com.typesafe.config.ConfigFactory
-import java.util
-import java.util.concurrent.TimeUnit
-import metrics.{ApplicationMetrics, CouchbaseHealthCheck, HealthCheckActor}
+import com.codahale.metrics.JmxReporter
+import metrics.ApplicationMetrics
 import play.api.{Application, GlobalSettings}
 import play.api.mvc._
-import play.libs.Akka
 import scala.concurrent.Future
 import play.api.mvc.Results._
 import java.lang.reflect.Constructor
 import securesocial.core.RuntimeEnvironment
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
-import com.yammer.metrics.reporting.DatadogReporter
-import com.yammer.metrics.reporting.DatadogReporter.Expansions._
 
 object Global extends GlobalSettings{
-
-  private val config = ConfigFactory.load()
 
   /**
    * The runtime environment for this sample app.
@@ -77,19 +49,7 @@ object Global extends GlobalSettings{
   override def onStart(app: Application): Unit = {
     super.onStart(app)
 
-//    val healthCheckActor = Akka.system.actorOf(Props[HealthCheckActor], name = "healthCheckActor")
-//    Akka.system.scheduler.schedule(0 micro, 10 seconds, healthCheckActor, "tick")
-//
-//    val jmxReporter = JmxReporter.forRegistry(ApplicationMetrics.metricRegistry).build()
-//    jmxReporter.start()
-
-    val expansions = util.EnumSet.of(COUNT, RATE_1_MINUTE, RATE_15_MINUTE, MEDIAN, P95, P99)
-    val reporter = new DatadogReporter.Builder()
-      .withApiKey(config.getString("datadog.api.key"))
-      .withExpansions(expansions)
-      .withMetricsRegistry(ApplicationMetrics.metricRegistry)
-      .build()
-
-    reporter.start(5, TimeUnit.SECONDS)
+    val jmxReporter = JmxReporter.forRegistry(ApplicationMetrics.metricRegistry).build()
+    jmxReporter.start()
   }
 }

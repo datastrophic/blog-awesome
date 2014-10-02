@@ -17,8 +17,22 @@
 - name: Create shell script for launching the App
   action: template src=launch.sh.j2 dest={{ application.application_home }}/bin/launch.sh mode=755
 
+- name: Clear dev config
+  action: file path={{ item }} state=absent
+  with_items:
+    - "{{ application.application_home }}/conf/securesocial.conf"
+    - "{{ application.application_home }}/conf/couchbase.conf"
+    - "{{ application.application_home }}/conf/application.conf"
+    - "{{ application.application_home }}/conf/application.test.conf"
+
 - name: Copying SecureSocial configuration (overwrite)
-  action: template src=securesocial.conf.j2 dest={{ application.application_home }}/conf/production/securesocial.conf
+  action: template src=securesocial.conf.j2 dest={{ application.application_home }}/conf/securesocial.conf
+
+- name: Copying Couchbase configuration (overwrite)
+  action: template src=couchbase.conf.j2 dest={{ application.application_home }}/conf/couchbase.conf
+
+- name: Copying Application configuration (overwrite)
+  action: template src=application.conf.j2 dest={{ application.application_home }}/conf/application.conf
 
 - name: Launch Awesomeness
   action: shell nohup {{ application.application_home }}/bin/launch.sh

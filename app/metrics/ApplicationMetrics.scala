@@ -1,7 +1,6 @@
 package metrics
 
 import com.codahale.metrics.{JmxReporter, MetricRegistry}
-import com.codahale.metrics.health.HealthCheckRegistry
 
 object ApplicationMetrics {
 
