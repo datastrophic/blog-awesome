@@ -6,7 +6,7 @@ import securesocial.core.providers.MailToken
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.{BasicProfile, PasswordInfo}
 
-class SocialUserService extends  UserService[SocialUser] with ReactiveCouchbaseClient{
+class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseClient{
 
  import SocialUserFormats._
  implicit val ec = ExecutionContext.Implicits.global

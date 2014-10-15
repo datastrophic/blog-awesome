@@ -10,46 +10,121 @@
         @navbar(user)(None)(editMode = false)
 
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
-        <script type='text/javascript' src='@routes.Assets.at("javascripts/external/gist-embed/gist-embed.js")'></script>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/about.css")'/>
 
 
-        <!-- Page Content -->
-        <div class="container">
-            <div class="page-header" id="banner">
+        <section class="fo-header">
+            <div class="container">
                 <div class="row">
-                    <div class="col-md-10 col-md-offset-1">
-                        <h1>About</h1>
+                    <div class="col-lg-12">
+                        <img class="img-responsive" src="@routes.Assets.at("images/nrol-octopus.png")" alt="">
+                        <div class="intro-text">
+                            <span class="name">Flying Octopus</span>
+                                <hr class="star-light">
+                                <span class="skills">[a blog about distributed systems, functional programming and all around]</span>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="row">
-
-                    <!-- Blog Post Content Column -->
-                <div class="col-md-10 col-md-offset-1">
-                    @* for(block <- post.body){
-                        @if(block.`type` == "text") {
-                            <p class="md-content">@{block.data}</p>
-                        } 
-
-                        @if(block.`type` == "gist") {
-                            <code data-gist-id="@{block.data}"></code>
-                        }
-
-                        @if(block.`type` == "image") {
-                            <div style="text-align: center">
-                                <p class="md-content">![](@{block.data})</p>
-                            </div>
-                        }
-                    } *@
-                    <hr>
-
+        </section>
+            <!-- About Section -->
+        <section class="success" id="about">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <h2>About this blog</h2>
+                        <hr class="star-light">
+                    </div>
                 </div>
-
+                <div class="row col-lg-8 col-md-offset-2">
+                        <ul class="skills-font">
+                            <li>purpose: sharing experience, write down how-tos for not forget</li>
+                        <li>focus: distributed systems and functional programming, some algorithms</li>
+                        <li>why octopus: inspired by github’s octocats and due to distributed asynchronous nature of octopus (flying because flying is fast)</li>
+                        </ul>
                 </div>
-            <hr>
-          @footer()
-        </div>
+            </div>
+        </section>
+
+            <!-- Author Section -->
+        <section id="author">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <div>
+                            <h2>About author</h2>
+                            <hr class="star-light">
+                            <span class="skills-font">In short: I’m a Scala hacker addicted to distributed systems and big data architectures development</span>
+                        </div>
+
+                        <img class="img-responsive" src="@routes.Assets.at("images/author_photo.png")" alt="">
+
+                        <div class="row col-lg-8 col-md-offset-2">
+
+                                <ul class="skills-font">
+                                    <li>* years experienced software engineer, dealing with different kind of systems from full-stack web development to heavily distributed platforms for RTB and data analysis</li>>
+                                    <li>Got my Ph.D. in Computer Science with dissertation on “natural language search queries modeling and optimization</li>>
+                                    <li>fell in love with Scala despite its complexity. Scala gives a lot of ways to express developer’s idea in concise way which could hardly be achieved in most of mainstream languages</li>
+                                    </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+            <!-- Objectives Section -->
+        <section class="success" id="objectives">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <div class="intro-text">
+                            <h2>Objectives</h2>
+                            <hr class="star-light">
+                        </div>
+
+                        <div class="row col-lg-8 col-md-offset-2">
+                                <ul class="skills-font">
+                                    <li>startups participation</li>
+                                    <li>bleeding edge technologies usage</li>
+                                    <li>coaching and teaching</li>
+                                    <li>meetups and conference talks</li>
+                                    </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+            <!-- Contacts Section -->
+        <section id="contacts">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <div class="intro-text">
+                            <h2>Contacts</h2>
+                            <hr class="star-light">
+                        </div>
+
+                        <div class="row col-lg-8 col-md-offset-2">
+
+                                <ul class="skills-font">
+                                    <li>the fastest way to contact me is twitter</li>
+                                    <li>g+, where I post links for interesting technologies and material</li>
+                                    <li>github account, from where you can clone this blog engine (pull requests appreciated though)</li>
+                                    <li>linkedin profile for recruiters </li>
+                                    </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+            <div>
+        @footer()
+            </div>
     </body>
 
 </html>

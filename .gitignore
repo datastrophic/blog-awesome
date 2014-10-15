@@ -10,6 +10,9 @@ dist
 *.ipr
 *.iws
 *.log
+*.png
+*.ico
+*.png
 /out
 /.idea_modules
 /.classpath
