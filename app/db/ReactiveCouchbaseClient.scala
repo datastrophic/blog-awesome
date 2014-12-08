@@ -7,20 +7,34 @@ import java.util.concurrent.TimeUnit
 import com.typesafe.config.ConfigFactory
 
 trait ReactiveCouchbaseClient {
-  import ReactiveCouchbaseClient._
+  implicit val ec = ExecutionContext.Implicits.global
+  val timeout = Duration(10, TimeUnit.SECONDS)
+
+  val driver = ReactiveCouchbaseDriver()
+  val config = ConfigFactory.load()
+
+  def bucketName: String
+
+  val DesignDocName = "blog_mr"
+  def bucket: CouchbaseBucket = driver.bucket(bucketName)
 
   def executeWithBucket[T](function: CouchbaseBucket => T) = {
     function(bucket)
   }
 }
 
-object ReactiveCouchbaseClient {
-  implicit val ec = ExecutionContext.Implicits.global
-  val timeout = Duration(10, TimeUnit.SECONDS)
+trait UserBucketClient extends ReactiveCouchbaseClient{
+  override def bucketName: String = config.getString("couchbase.user.bucket")
+}
 
-  val config = ConfigFactory.load()
+trait PostBucketClient extends ReactiveCouchbaseClient{
+  override def bucketName: String = config.getString("couchbase.post.bucket")
+}
 
-  val driver = ReactiveCouchbaseDriver()
-  val bucketName = config.getString("couchbase.default.bucket")
-  val bucket = driver.bucket(bucketName)
+trait TagBucketClient extends ReactiveCouchbaseClient{
+  override def bucketName: String = config.getString("couchbase.tag.bucket")
+}
+
+trait CommentBucketClient extends ReactiveCouchbaseClient{
+  override def bucketName: String = config.getString("couchbase.comment.bucket")
 }

@@ -1,11 +1,11 @@
 package dao
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import org.reactivecouchbase.client.OpResult
 import net.spy.memcached.ops.OperationStatus
+import db.TagBucketClient
 
-object TagDao extends BaseDao[List[String]]{
+class TagDao extends BaseDao[List[String]]  with TagBucketClient{
 
   val TagKey = "fo::tags"
 

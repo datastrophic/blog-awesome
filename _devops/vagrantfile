@@ -8,7 +8,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   base_box = "ubuntu/trusty64"
 
-  config.vm.define :master do |master|
+  config.vm.define :octopus do |master|
     master.vm.box = base_box
     master.vm.network :private_network, ip: "192.168.100.10"
     master.vm.hostname = "master"

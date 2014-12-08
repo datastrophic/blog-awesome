@@ -1,15 +1,14 @@
 package dao
 
 import domain.{ViewPage, Post}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, ExecutionContext, Await}
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
-import domain.DomainJsonFormats._
-import org.reactivecouchbase.client.OpResult
-import play.api.libs.json.{Json, JsObject, Writes, Reads}
 import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
+import db.PostBucketClient
+import domain.DomainJsonFormats._
 
-object PostDAO extends BaseDao[Post]{
+
+class PostDao extends BaseDao[Post] with PostBucketClient{
 
   /**
    * Only published posts are shown, drafts are ignored (see by_tag couchbase view)
@@ -27,7 +26,7 @@ object PostDAO extends BaseDao[Post]{
         .setSkip(ViewPage.PageSize * (pageNum-1))
         .setStale(Stale.FALSE)
 
-        bucket.find[Post]("octopus_mr", "by_tag")(query)
+        bucket.find[Post](DesignDocName, "by_tag")(query)
     })
   }
 
@@ -48,17 +47,11 @@ object PostDAO extends BaseDao[Post]{
         .setSkip(ViewPage.PageSize * (pageNum-1))
         .setStale(Stale.FALSE)
 
-      bucket.find[Post]("octopus_mr", "by_draft")(query)
+      bucket.find[Post](DesignDocName, "by_draft")(query)
     })
   }
 
   def exists(uid: String): Boolean = {
     Await.result(get(uid), 5 seconds).isDefined
   }
-
-  def save(key: String, entity: Post) = super.save(key, entity)
-
-  def get(key: String) = super.get(key)
-
-  def delete(key: String) = super.delete(key)
 }

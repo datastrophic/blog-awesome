@@ -2,15 +2,18 @@ package service
 
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
-import dao.{TagDao, PostDAO}
+import dao.{TagDao, PostDao}
 import domain.{ViewPage, PostPreview, Post}
 import play.api.libs.json.JsValue
 import util.{StringAndDateUtils, JsonPostTransformer}
 import java.util.Date
 import play.api.Logger
 import metrics.ApplicationMetrics._
+import scala.concurrent.ExecutionContext.Implicits.global
+import domain.DomainJsonFormats._
 
-object PostService {
+
+class PostService(postDao: PostDao, tagDao: TagDao) {
 
   private val logger = Logger("[PostService]")
 
@@ -18,7 +21,7 @@ object PostService {
     logger.info(s"Attempting to get post by id [$uid]")
     val context = couchbaseReadTime.time()
 
-    val post = Await.result(PostDAO.get(uid), 5 seconds)
+    val post = Await.result(postDao.get(uid), 5 seconds)
 
     logger.info(s"Post lookup by id [$uid] found: ${post.isDefined}")
     couchbaseReadRequests.mark()
@@ -31,7 +34,7 @@ object PostService {
     logger.info(s"Attempting to get published posts page #${pageNum.getOrElse(1)}")
     val context = couchbaseMRTime.time()
 
-    val previews = getPostPreviews(PostDAO.findSubmittedPosts(pageNum.getOrElse(1)))
+    val previews = getPostPreviews(postDao.findSubmittedPosts(pageNum.getOrElse(1)))
 
     logger.info(s"${previews.size} published posts found for page #${pageNum.getOrElse(1)}")
     couchbaseMRRequests.mark()
@@ -44,7 +47,7 @@ object PostService {
     logger.info(s"Attempting to get drafts page #${pageNum.getOrElse(1)}")
     val context = couchbaseMRTime.time()
 
-    val previews = getPostPreviews(PostDAO.findDrafts(pageNum.getOrElse(1)))
+    val previews = getPostPreviews(postDao.findDrafts(pageNum.getOrElse(1)))
 
     logger.info(s"${previews.size} drafts found for page #${pageNum.getOrElse(1)}")
     couchbaseMRRequests.mark()
@@ -57,7 +60,7 @@ object PostService {
     logger.info(s"Attempting to get posts by tag [$tag], page #${pageNum.getOrElse(1)}")
     val context = couchbaseMRTime.time()
 
-    val previews = getPostPreviews(PostDAO.findPostsByTag(tag, pageNum.getOrElse(1)))
+    val previews = getPostPreviews(postDao.findPostsByTag(tag, pageNum.getOrElse(1)))
 
     logger.info(s"${previews.size} posts with tag [$tag] found for page #${pageNum.getOrElse(1)}")
     couchbaseMRRequests.mark()
@@ -68,7 +71,7 @@ object PostService {
 
   def deletePostById(uid: String) = {
     logger.info(s"Deleting post by uid [$uid]")
-    PostDAO.delete(uid)
+    postDao.delete(uid)
   }
 
   private def getPostPreviews(awaitablePosts: Future[List[Post]]): List[PostPreview] = {
@@ -87,7 +90,7 @@ object PostService {
       val generatedUID = StringAndDateUtils.generateUID(p.title)
       val dateAsMillis = new Date().getTime
 
-      PostDAO.save(generatedUID, newPost.get.copy(id = Some(generatedUID), isDraft = true, displayedDate = StringAndDateUtils.getCurrentDateAsString, date = dateAsMillis))
+      postDao.save(generatedUID, newPost.get.copy(id = Some(generatedUID), isDraft = true, displayedDate = StringAndDateUtils.getCurrentDateAsString, date = dateAsMillis))
 
       logger.info(s"Post saved with uid [$generatedUID]")
       couchbaseWriteRequests.mark()
@@ -111,10 +114,10 @@ object PostService {
       getPostById(uid.trim) map { savedPost =>
         logger.info("Post for update found")
 
-        PostDAO.save(generatedUID, newPost.get.copy(id = Some(generatedUID), displayedDate = savedPost.displayedDate, date = savedPost.date))
+        postDao.save(generatedUID, newPost.get.copy(id = Some(generatedUID), displayedDate = savedPost.displayedDate, date = savedPost.date))
 
         if (uid != generatedUID) {
-          PostDAO.delete(uid)
+          postDao.delete(uid)
           logger.info(s"Post saved with uid [$generatedUID], old post deleted")
         } else {
           logger.info(s"Post with uid [$generatedUID] updated")
@@ -135,9 +138,9 @@ object PostService {
 
       val newPost = post.copy(isDraft = false)
 
-      PostDAO.save(uid, newPost)
+      postDao.save(uid, newPost)
 
-      TagDao.mergeTags(post.tags) //! happens only when post is being published to minimize amount of trash tags
+      tagDao.mergeTags(post.tags) //! happens only when post is being published to minimize amount of trash tags
 
       logger.info(s"Post with uid [$uid] published")
       couchbaseWriteRequests.mark()

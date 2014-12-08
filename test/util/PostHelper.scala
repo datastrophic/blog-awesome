@@ -2,12 +2,13 @@ package util
 
 import domain.{Comment, Post}
 import java.util._
-import db.ReactiveCouchbaseClient
+import db.{CommentBucketClient, ReactiveCouchbaseClient}
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import scala.List
 import scala.Some
 import domain.Post
+import dao.PostDao
 
 object PostHelper{
 
@@ -49,7 +50,7 @@ object PostHelper{
     implicit val ec = ExecutionContext.Implicits.global
 
     try {
-      Await.result(ReactiveCouchbaseClient.bucket.flush(), 15 seconds)
+      Await.result(new PostDao().bucket.flush(), 15 seconds)
     } catch {
       case e: UnsupportedOperationException => println(e.getMessage)
     }

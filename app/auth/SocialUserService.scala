@@ -5,22 +5,23 @@ import securesocial.core.services.{SaveMode, UserService}
 import securesocial.core.providers.MailToken
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.{BasicProfile, PasswordInfo}
+import util.IdGenerator
 
 class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseClient{
 
  import SocialUserFormats._
- implicit val ec = ExecutionContext.Implicits.global
 
   override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = {
+    val uid = IdGenerator.computeUID(providerId, userId)
 
-    getUserByKey(s"$providerId::$userId").map(customUser => customUser.map(user => user.profile))
+    getUserByKey(uid).map(customUser => customUser.map(user => user.profile))
 
   }
 
   override def save(profile: BasicProfile, mode: SaveMode): Future[SocialUser] = {
-    val key = s"${profile.providerId}::${profile.userId}"
+    val uid = IdGenerator.computeUID(profile.providerId, profile.userId)
 
-    getUserByKey(key).map(user => {
+    getUserByKey(uid).map(user => {
 
       if(user.isDefined) user.get
 
@@ -28,7 +29,7 @@ class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseCl
         val newUser = SocialUser(profile, isAdmin = false, List(profile))
 
         executeWithBucket(bucket =>
-          bucket.set[SocialUser](s"${profile.providerId}::${profile.userId}", newUser)
+          bucket.set[SocialUser](uid, newUser)
         )
 
         newUser
@@ -58,4 +59,6 @@ class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseCl
   override def updatePasswordInfo(user: SocialUser, info: PasswordInfo): Future[Option[BasicProfile]] = ???
 
   override def saveToken(token: MailToken): Future[MailToken] = ???
+
+  override def bucketName: String = "users"
 }

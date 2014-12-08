@@ -1,6 +1,6 @@
 package controllers
 
-import securesocial.core.{Authorization, RuntimeEnvironment}
+import securesocial.core.{SecureSocial, Authorization, RuntimeEnvironment}
 import auth.{SecureSocialAuth, SocialUser}
 import play.api.mvc.RequestHeader
 import play.api.libs.json.Json
@@ -14,8 +14,9 @@ import scalax.file.Path
 import play.api.Play.current
 import com.typesafe.config.ConfigFactory
 
-class ImageController (override implicit val env: RuntimeEnvironment[SocialUser])
-  extends securesocial.core.SecureSocial[SocialUser]  with SecureSocialAuth{
+//class ImageController(userService: UserService, override implicit val env: RuntimeEnvironment[User]) extends SecureSocial[User] with SecureSocialAuth {
+
+class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]) extends SecureSocial[SocialUser]  with SecureSocialAuth{
 
   private val logger = Logger("[ImageController]")
 
@@ -29,7 +30,7 @@ class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]
     else s"$confPath/"
   }
 
-  val pathPrefix = if (Play.isProd) s"$imageFolder" else s"/tmp/playblog"
+  val pathPrefix = if (Play.isProd) s"$imageFolder" else s"/tmp/octopus/images"
 
   private val random = new SecureRandom()
 

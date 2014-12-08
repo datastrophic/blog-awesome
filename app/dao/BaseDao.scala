@@ -18,4 +18,8 @@ trait BaseDao[T] extends ReactiveCouchbaseClient {
     executeWithBucket(bucket => bucket.delete(key))
   }
 
+  def destroy() = {
+    driver.shutdown()
+  }
+
 }

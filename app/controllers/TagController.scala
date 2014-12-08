@@ -8,7 +8,7 @@ import dao.TagDao
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class TagsController (override implicit val env: RuntimeEnvironment[SocialUser])
+class TagController (tagDao: TagDao, override implicit val env: RuntimeEnvironment[SocialUser])
   extends securesocial.core.SecureSocial[SocialUser]  with SecureSocialAuth{
 
   private val logger = Logger("[TagsController]")
@@ -17,7 +17,7 @@ class TagsController (override implicit val env: RuntimeEnvironment[SocialUser])
     implicit request =>
       logger.info(s"Start reading tag list from DB")
 
-      val tags = Await.result(TagDao.getTags, 5 seconds)
+      val tags = Await.result(tagDao.getTags, 5 seconds)
 
       logger.info(s"${tags.size} tags are read from DB")
 

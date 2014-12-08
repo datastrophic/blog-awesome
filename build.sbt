@@ -13,7 +13,9 @@ scalaVersion := "2.11.1"
 resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots"),
   Classpaths.sbtPluginReleases,
-  "ReactiveCouchbase repository" at "https://raw.github.com/ReactiveCouchbase/repository/master/snapshots"
+  "ReactiveCouchbase" at "https://raw.github.com/ReactiveCouchbase/repository/master/releases/",
+  "ReactiveCouchbase Snapshots" at "https://raw.github.com/ReactiveCouchbase/repository/master/snapshots/",
+  "SpringSource Snapshot Repository" at "http://repo.springsource.org/snapshot"
 )
 
 javaOptions in Test += "-Dconfig.file=conf/application.test.conf"
@@ -26,9 +28,10 @@ libraryDependencies ++= Seq(
     filters,
     cache,
     //Clients
-    "org.reactivecouchbase" %% "reactivecouchbase-core" % "0.3-SNAPSHOT",
+    "org.reactivecouchbase" %% "reactivecouchbase-core" % "0.4-SNAPSHOT",
     //Auth
     "ws.securesocial" %% "securesocial" % "master-SNAPSHOT",
+    "org.springframework.scala" %% "spring-scala" % "1.0.0.BUILD-SNAPSHOT",
     // WebJars (i.e. client-side) dependencies
     "org.webjars" %% "webjars-play" % "2.3.0",
     "org.webjars" % "requirejs" % "2.1.14-1",

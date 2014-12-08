@@ -1,5 +1,5 @@
 import controllers.{ImageController, PostController}
-import dao.PostDAO
+import dao.PostDao
 import domain.Post
 import play.api.libs.Files.TemporaryFile
 import play.api.libs.iteratee.{Input, Step}
@@ -13,10 +13,13 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 import util.{JsonPostTransformer, PostHelper}
 import scala.concurrent.ExecutionContext.Implicits.global
+import domain.DomainJsonFormats._
 
 class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
 
   private def errorMessage = "{\"error\":\"Credentials required\"}"
+
+  private val postDao = new PostDao
 
   "Secured Actions" should {
     "allow access to index page for unauthorized users" in {
@@ -146,10 +149,10 @@ class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
   }
 
   private def savePostByKey(key: String, post: Post) = {
-    Await.result(PostDAO.save(key, post), 5 seconds)
+    Await.result(postDao.save(key, post), 5 seconds)
   }
 
   private def deleteByKey(key: String) = {
-    Await.result(PostDAO.delete(key), 5 seconds)
+    Await.result(postDao.delete(key), 5 seconds)
   }
 }

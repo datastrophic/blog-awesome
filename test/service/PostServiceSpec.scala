@@ -3,18 +3,23 @@ package service
 import org.specs2.mutable.Specification
 import org.specs2.time.NoTimeConversions
 import domain.{DataBlock, PostPreview, ViewPage, Post}
-import dao.PostDAO
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import util.{StringAndDateUtils, PostHelper}
 import play.api.libs.json.{Json, JsValue}
 import java.util.concurrent.ConcurrentLinkedQueue
 import scala.collection.JavaConversions._
+import dao.{TagDao, PostDao}
+import domain.DomainJsonFormats._
 
 
-class PostServiceSpec extends Specification with NoTimeConversions{
+class postServiceSpec extends Specification with NoTimeConversions{
 
   private val keys = new ConcurrentLinkedQueue[String]()
+
+  private val postDao = new PostDao
+  private val tagDao = new TagDao
+  private val postService = new PostService(postDao, tagDao)
 
   sequential
 
@@ -27,7 +32,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       val post = PostHelper.createBlankPost.copy(id = Some(sampleUid))
       savePost(post)
 
-      val foundPost = PostService.getPostById(sampleUid)
+      val foundPost = postService.getPostById(sampleUid)
 
       foundPost.isDefined mustEqual true
       foundPost.get.id mustEqual post.id
@@ -36,7 +41,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
       deletePost(post)
 
-      PostService.getPostById(sampleUid).isDefined mustEqual false
+      postService.getPostById(sampleUid).isDefined mustEqual false
     }
 
     "correctly get posts list with pagination [getPosts]" in {
@@ -45,17 +50,17 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
       posts foreach savePost
 
-      val firstPagePosts = PostService.getPosts(None)
+      val firstPagePosts = postService.getPosts(None)
       firstPagePosts.size mustEqual ViewPage.PageSize
       firstPagePosts.head.id mustEqual posts.last.id.get //saved last shown first
 
-      val lastPagePosts = PostService.getPosts(Some(amount / ViewPage.PageSize + 1))
+      val lastPagePosts = postService.getPosts(Some(amount / ViewPage.PageSize + 1))
       lastPagePosts.size mustEqual amount % ViewPage.PageSize
       lastPagePosts.last.id mustEqual posts.head.id.get //saved last shown first
 
       posts foreach deletePost
 
-      val expectedEmptyList = PostService.getPosts(None)
+      val expectedEmptyList = postService.getPosts(None)
       expectedEmptyList.size mustEqual 0
     }
 
@@ -65,17 +70,17 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
       posts foreach savePost
 
-      val firstPagePosts = PostService.getDrafts(None)
+      val firstPagePosts = postService.getDrafts(None)
       firstPagePosts.size mustEqual ViewPage.PageSize
       firstPagePosts.head.id mustEqual posts.last.id.get //saved last shown first
 
-      val lastPagePosts = PostService.getDrafts(Some(amount / ViewPage.PageSize + 1))
+      val lastPagePosts = postService.getDrafts(Some(amount / ViewPage.PageSize + 1))
       lastPagePosts.size mustEqual amount % ViewPage.PageSize
       lastPagePosts.last.id mustEqual posts.head.id.get //saved last shown first
 
       posts foreach deletePost
 
-      val expectedEmptyList = PostService.getPosts(None)
+      val expectedEmptyList = postService.getPosts(None)
       expectedEmptyList.size mustEqual 0
     }
     "correctly get posts by tag with pagination [getPostsByTag]" in {
@@ -89,7 +94,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       postsTag1 foreach savePost
       savePost(postTag2)
 
-      val firstPagePosts = PostService.getPostsByTag(tags1.head, None)
+      val firstPagePosts = postService.getPostsByTag(tags1.head, None)
       firstPagePosts.size mustEqual ViewPage.PageSize
       firstPagePosts.head.id mustEqual postTag2.id.get //saved last shown first
       firstPagePosts.head.tags.size mustEqual tags1.size
@@ -97,14 +102,14 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       firstPagePosts.head.tags.contains(tags1.last) mustEqual false
       firstPagePosts.head.tags.contains(tags2.last) mustEqual true
 
-      val lastPagePosts = PostService.getPostsByTag(tags1.head, Some(amount / ViewPage.PageSize + 1))
+      val lastPagePosts = postService.getPostsByTag(tags1.head, Some(amount / ViewPage.PageSize + 1))
       lastPagePosts.size mustEqual amount % ViewPage.PageSize+1
       lastPagePosts.last.id mustEqual postsTag1.head.id.get //saved last shown first
       lastPagePosts.head.tags.size mustEqual tags1.size
       lastPagePosts.head.tags.contains(tags1.head) mustEqual true
       lastPagePosts.head.tags.contains(tags1.last) mustEqual true
 
-      val singleTagPosts = PostService.getPostsByTag(tags2.head, None)
+      val singleTagPosts = postService.getPostsByTag(tags2.head, None)
       singleTagPosts.size mustEqual 1
       singleTagPosts.head.id mustEqual postTag2.id.get
       singleTagPosts.head.tags.size mustEqual tags2.size
@@ -114,7 +119,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       postsTag1 foreach deletePost
       deletePost(postTag2)
 
-      val expectedEmptyList = PostService.getPostsByTag(tags1.head, None)
+      val expectedEmptyList = postService.getPostsByTag(tags1.head, None)
       expectedEmptyList.size mustEqual 0
     }
 
@@ -128,7 +133,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       foundPost.isDefined mustEqual true
       foundPost.get.id mustEqual post.id
 
-      PostService.deletePostById(uid)
+      postService.deletePostById(uid)
 
       getById(uid).isDefined mustEqual false
     }
@@ -148,7 +153,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
       val json: JsValue = Json.parse(sample)
 
-      val result = PostService.saveJsonPost(json)
+      val result = postService.saveJsonPost(json)
       result.isRight mustEqual true
 
       val generatedUid = StringAndDateUtils.generateUID(title)
@@ -192,7 +197,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       val json: JsValue = Json.parse(updateSample)
 
 
-      val result = PostService.updateExistingPost(generatedUid, json)
+      val result = postService.updateExistingPost(generatedUid, json)
       result.isRight mustEqual true
       result.right.get mustEqual newGeneratedUid
 
@@ -216,7 +221,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
 
       savePost(draft)
 
-      val result = PostService.publishPost(uid)
+      val result = postService.publishPost(uid)
       result.isRight mustEqual true
       result.right.get mustEqual true
 
@@ -233,13 +238,13 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       val sourceUrl = "/"
 
       //first page
-      val firstPageView = PostService.createViewPage(sourceUrl, fullPreviews, None)
+      val firstPageView = postService.createViewPage(sourceUrl, fullPreviews, None)
       firstPageView.previous.isDefined mustEqual false
       firstPageView.next.isDefined mustEqual true
       firstPageView.next.get mustEqual s"$sourceUrl?page=2"
 
       //second page
-      val secondPageView = PostService.createViewPage(sourceUrl, fullPreviews, Some(2))
+      val secondPageView = postService.createViewPage(sourceUrl, fullPreviews, Some(2))
       secondPageView.previous.isDefined mustEqual true
       secondPageView.previous.get mustEqual s"$sourceUrl"
 
@@ -247,7 +252,7 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       secondPageView.next.get mustEqual s"$sourceUrl?page=3"
 
       //somewhere in the middle
-      val middlePageView = PostService.createViewPage(sourceUrl, fullPreviews, Some(4))
+      val middlePageView = postService.createViewPage(sourceUrl, fullPreviews, Some(4))
       middlePageView.previous.isDefined mustEqual true
       middlePageView.previous.get mustEqual s"$sourceUrl?page=3"
 
@@ -255,14 +260,14 @@ class PostServiceSpec extends Specification with NoTimeConversions{
       middlePageView.next.get mustEqual s"$sourceUrl?page=5"
 
       //last page
-      val lastPageView = PostService.createViewPage(sourceUrl, partialPreviews, Some(4))
+      val lastPageView = postService.createViewPage(sourceUrl, partialPreviews, Some(4))
       lastPageView.previous.isDefined mustEqual true
       lastPageView.previous.get mustEqual s"$sourceUrl?page=3"
 
       lastPageView.next.isDefined mustEqual false
 
       //nothing to display
-      val emptyPageView = PostService.createViewPage(sourceUrl, List(), Some(4))
+      val emptyPageView = postService.createViewPage(sourceUrl, List(), Some(4))
       emptyPageView.previous.isDefined mustEqual true
       emptyPageView.previous.get mustEqual s"$sourceUrl?page=3"
 
@@ -286,15 +291,15 @@ class PostServiceSpec extends Specification with NoTimeConversions{
   }
 
   private def getById(uid: String) = {
-    Await.result(PostDAO.get(uid), 5 seconds)
+    Await.result(postDao.get(uid), 5 seconds)
   }
 
   private def savePostByKey(key: String, post: Post) = {
     keys.add(key)
-    Await.result(PostDAO.save(key, post), 5 seconds)
+    Await.result(postDao.save(key, post), 5 seconds)
   }
 
   private def deleteByKey(key: String) = {
-    Await.result(PostDAO.delete(key), 5 seconds)
+    Await.result(postDao.delete(key), 5 seconds)
   }
 }

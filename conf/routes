@@ -3,7 +3,7 @@
 # ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
-GET           /images/*file         controllers.ExternalAssets.at(path="/tmp/playblog/images", file)
+GET           /images/*file         controllers.ExternalAssets.at(path="/tmp/octopus/images", file)
 GET           /assets/*file         controllers.Assets.at(path="/public", file)
 GET           /webjars/*file        controllers.WebJarAssets.at(file)
 
@@ -18,12 +18,19 @@ POST          /post                 @controllers.PostController.createPost
 PATCH         /post/:uid            @controllers.PostController.updatePost(uid)
 GET           /drafts               @controllers.PostController.getDraftsPage(page: Option[Int])
 
+#comments
+GET           /comment/post/:postId        @controllers.CommentController.getPostComments(postId)
+POST          /comment                     @controllers.CommentController.createComment
+PUT           /comment/:commentId          @controllers.CommentController.updateComment(commentId)
+DELETE        /comment/:commentId          @controllers.CommentController.deleteComment(commentId)
+
+
 GET           /logout               @controllers.CustomLoginController.logout
 GET           /auth/login           @controllers.CustomLoginController.login
 GET           /notfound             @controllers.CustomLoginController.notfound
 GET           /about                @controllers.UtilController.about
 
 POST          /image                @controllers.ImageController.uploadImage
-GET           /taglist              @controllers.TagsController.getTagList
+GET           /taglist              @controllers.TagController.getTagList
 
 ->            /auth                 securesocial.Routes

@@ -3,26 +3,36 @@ admin_user: admin
 admin_password: password
 
 # ram quota for the cluster
-cluster_ram_quota: 1024
+cluster_ram_quota: 1400
 
 buckets:
-  octopus:
-    name: octopus
-    ram_quota: 512
-    replica_number: 0
-    enable_flush: 0
-  test:
-    name: test
+  users:
+    name: users
     ram_quota: 256
     replica_number: 0
     enable_flush: 1
+  tags:
+    name: tags
+    ram_quota: 100
+    replica_number: 0
+    enable_flush: 1
+  comments:
+      name: comments
+      ram_quota: 256
+      replica_number: 0
+      enable_flush: 1
+  posts:
+      name: posts
+      ram_quota: 512
+      replica_number: 0
+      enable_flush: 1
 
 design_docs:
-  - docname: octopus_mr
-    file: mr_views.json
+  - docname: blog_mr
+    file: post_views.json
     buckets:
-      - octopus
-  - docname: octopus_mr
-    file: mr_views.json
+      - posts
+  - docname: blog_mr
+    file: comment_views.json
     buckets:
-      - test
+      - comments

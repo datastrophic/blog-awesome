@@ -1,0 +1,9 @@
+{
+    "views" : {
+        "by_post" : {
+            "map" : "function (doc, meta) {\n   if (doc.postId && doc.date) {\n  emit([doc.postId, doc.date], null);\n }\n }"
+        }
+    }
+}
+
+
