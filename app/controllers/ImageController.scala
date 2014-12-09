@@ -22,15 +22,8 @@ class ImageController (override implicit val env: RuntimeEnvironment[SocialUser]
 
   private val config = ConfigFactory.load()
 
-  private val currentHost: String = config.getString("current.host")
-  private def imageFolder: String = {
-    val confPath = config.getString("image.system.path")
-
-    if(confPath.endsWith("/")) confPath
-    else s"$confPath/"
-  }
-
-  val pathPrefix = if (Play.isProd) s"$imageFolder" else s"/tmp/octopus/images"
+  private val currentHost = config.getString("current.host")
+  private val pathPrefix = config.getString("image.system.path")
 
   private val random = new SecureRandom()
 

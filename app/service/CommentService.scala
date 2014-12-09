@@ -10,7 +10,7 @@ import java.util.Date
 import play.api.Logger
 import metrics.ApplicationMetrics._
 import scala.concurrent.ExecutionContext.Implicits.global
-import domain.DomainJsonFormats._
+import domain.JsonFormats._
 
 class CommentService(commentDao: CommentDao) {
 
@@ -51,15 +51,15 @@ class CommentService(commentDao: CommentDao) {
     )
   }
 
-  def updateComment(reviewId: String, json: JsValue): Either[String,String] = {
+  def updateComment(commentId: String, json: JsValue): Either[String,String] = {
     val validatedJson = json.validate[Comment]
     validatedJson.fold(
       errors => {
         Left(JsError.toFlatJson(errors).toString())
       },
       review => {
-        if(exists(reviewId)){
-          commentDao.save(reviewId, review)
+        if(exists(commentId)){
+          commentDao.save(commentId, review)
           Right(s"Comment with id ${review.id.get} updated")
         } else {
           Left(s"Comment with id ${review.id.get} not found!")

@@ -5,7 +5,7 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
 import db.PostBucketClient
-import domain.DomainJsonFormats._
+import domain.JsonFormats._
 
 
 class PostDao extends BaseDao[Post] with PostBucketClient{

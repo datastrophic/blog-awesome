@@ -34,11 +34,6 @@ class ApplicationConfig extends FunctionalConfiguration {
     new PostService(postDao(), tagDao())
   }
 
-
-  val tagService = bean(){
-    new CommentService(commentDao())
-  }
-
   val secureSocialUserService = bean(){
     new SocialUserService()
   }

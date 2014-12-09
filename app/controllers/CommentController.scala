@@ -8,8 +8,7 @@ import play.api.Logger
 import metrics.ApplicationMetrics._
 import domain.ViewPage
 import play.api.libs.json.Json
-import domain.CommentConverter._
-import domain.DomainJsonFormats._
+import domain.JsonFormats._
 
 class CommentController(commentService: CommentService, override implicit val env: RuntimeEnvironment[SocialUser])
   extends securesocial.core.SecureSocial[SocialUser] with SecureSocialAuth{
@@ -40,7 +39,7 @@ class CommentController(commentService: CommentService, override implicit val en
   }
 
   def getPostComments(postId: String)= SecuredAction{implicit request =>
-    val comments = commentService.getCommentsByPostId(postId).map(_.toUIComment)
+    val comments = commentService.getCommentsByPostId(postId)
     Ok(Json.toJson(comments))
   }
 

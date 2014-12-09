@@ -3,7 +3,7 @@ package dao
 import domain.Comment
 import db.CommentBucketClient
 import scala.concurrent.Future
-import domain.DomainJsonFormats._
+import domain.JsonFormats._
 import com.couchbase.client.protocol.views.{Stale, ComplexKey, Query}
 
 class CommentDao extends BaseDao[Comment]  with CommentBucketClient {
@@ -21,7 +21,7 @@ class CommentDao extends BaseDao[Comment]  with CommentBucketClient {
       val query = new Query()
         .setIncludeDocs(true)
         .setRangeStart(ComplexKey.of(uid,"""{}"""))
-        .setRangeEnd(ComplexKey.of(uid).forceArray(true))
+        .setRangeEnd(ComplexKey.of(uid))
         .setInclusiveEnd(true)
         .setDescending(true)
         .setLimit(limit)

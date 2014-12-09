@@ -1,39 +1,41 @@
 package dao
 
-import org.specs2.mutable._
-import db.{TagBucketClient, ReactiveCouchbaseClient}
+import db.TagBucketClient
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import org.specs2.time.NoTimeConversions
+import util.SpringContextHelper
+import org.scalatest.junit.JUnitRunner
+import org.junit.runner.RunWith
+import org.scalatest.{BeforeAndAfterEach, BeforeAndAfterAll, Matchers, FunSpec}
 
-class TagDaoSpec extends Specification with TagBucketClient with NoTimeConversions{
+@RunWith(classOf[JUnitRunner])
+class TagDaoSpec extends FunSpec with TagBucketClient with Matchers with BeforeAndAfterAll with BeforeAndAfterEach{
 
-  sequential
-  private val tagDao = new TagDao
+  val context = SpringContextHelper.springContext
+  private val tagDao: TagDao = context.getBean(classOf[TagDao])
 
-  "Tag DAO" should {
+  describe("Tag DAO"){
 
-    "correctly get tags from DB" in {
+    it("correctly get tags from DB"){
 
       val tagsSample = List("tag1", "tag2", "tag3")
 
       Await.result(executeWithBucket(bucket => bucket.set[List[String]](tagDao.TagKey, tagsSample)), 5 seconds)
 
-      tagDao.getTags
       val tags = Await.result(tagDao.getTags, 5 seconds)
 
-      tags.size mustEqual tagsSample.size
-      tags.head mustEqual tagsSample.head
-      tags.last mustEqual tagsSample.last
+      tags.size shouldEqual tagsSample.size
+      tags.head shouldEqual tagsSample.head
+      tags.last shouldEqual tagsSample.last
 
       Await.result(executeWithBucket(bucket => bucket.delete(tagDao.TagKey)), 5 seconds)
 
       val emptyResult = Await.result(tagDao.getTags, 5 seconds)
 
-      emptyResult.size mustEqual 0
+      emptyResult.size shouldEqual 0
     }
 
-    "correctly merge tags" in {
+    it("correctly merge tags"){
       val tagsSample = List("tag1", "tag2")
 
       Await.result(executeWithBucket(bucket => bucket.set[List[String]](tagDao.TagKey, tagsSample)), 5 seconds)
@@ -44,16 +46,25 @@ class TagDaoSpec extends Specification with TagBucketClient with NoTimeConversio
 
       val mergedTags = Await.result(executeWithBucket(bucket => bucket.get[List[String]](tagDao.TagKey)), 5 seconds)
 
-      mergedTags.isDefined mustEqual true
-      mergedTags.get.size mustEqual tagsSample.size + 1
-      mergedTags.get.head mustEqual tagsSample.head
-      mergedTags.get.last mustEqual tagsToMerge.last
+      mergedTags.isDefined shouldEqual true
+      mergedTags.get.size shouldEqual tagsSample.size + 1
+      mergedTags.get.head shouldEqual tagsSample.head
+      mergedTags.get.last shouldEqual tagsToMerge.last
 
       Await.result(executeWithBucket(bucket => bucket.delete(tagDao.TagKey)), 5 seconds)
 
       val emptyResult = Await.result(tagDao.getTags, 5 seconds)
 
-      emptyResult.size mustEqual 0
+      emptyResult.size shouldEqual 0
     }
+  }
+
+  override protected def afterAll(): Unit = {
+    super.afterAll()
+
+      executeWithBucket(bucket => bucket.delete(tagDao.TagKey))
+
+    context.close()
+    context.destroy()
   }
 }

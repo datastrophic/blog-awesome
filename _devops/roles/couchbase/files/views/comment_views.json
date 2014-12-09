@@ -1,7 +1,7 @@
 {
     "views" : {
         "by_post" : {
-            "map" : "function (doc, meta) {\n   if (doc.postId && doc.date) {\n  emit([doc.postId, doc.date], null);\n }\n }"
+            "map" : "function (doc, meta) {\n   if (doc.postId && doc.timestamp) {\n  emit([doc.postId, doc.timestamp], null);\n }\n }"
         }
     }
 }

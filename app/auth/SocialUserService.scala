@@ -1,13 +1,13 @@
 package auth
 
-import db.ReactiveCouchbaseClient
+import db.{UserBucketClient, ReactiveCouchbaseClient}
 import securesocial.core.services.{SaveMode, UserService}
 import securesocial.core.providers.MailToken
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.{BasicProfile, PasswordInfo}
 import util.IdGenerator
 
-class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseClient{
+class SocialUserService extends UserService[SocialUser] with UserBucketClient{
 
  import SocialUserFormats._
 
@@ -26,7 +26,7 @@ class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseCl
       if(user.isDefined) user.get
 
       else{
-        val newUser = SocialUser(profile, isAdmin = false, List(profile))
+        val newUser = SocialUser(uid, profile, isAdmin = false, List(profile))
 
         executeWithBucket(bucket =>
           bucket.set[SocialUser](uid, newUser)
@@ -37,7 +37,7 @@ class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseCl
     })
   }
 
-  private def getUserByKey(key: String): Future[Option[SocialUser]] = {
+  def getUserByKey(key: String): Future[Option[SocialUser]] = {
     executeWithBucket(bucket => {
       bucket.get[SocialUser](key)
     })
@@ -59,6 +59,4 @@ class SocialUserService extends UserService[SocialUser] with ReactiveCouchbaseCl
   override def updatePasswordInfo(user: SocialUser, info: PasswordInfo): Future[Option[BasicProfile]] = ???
 
   override def saveToken(token: MailToken): Future[MailToken] = ???
-
-  override def bucketName: String = "users"
 }

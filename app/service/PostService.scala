@@ -10,7 +10,7 @@ import java.util.Date
 import play.api.Logger
 import metrics.ApplicationMetrics._
 import scala.concurrent.ExecutionContext.Implicits.global
-import domain.DomainJsonFormats._
+import domain.JsonFormats._
 
 
 class PostService(postDao: PostDao, tagDao: TagDao) {

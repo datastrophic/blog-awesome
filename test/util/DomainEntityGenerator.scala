@@ -2,15 +2,16 @@ package util
 
 import domain.{Comment, Post}
 import java.util._
-import db.{CommentBucketClient, ReactiveCouchbaseClient}
+import db.CommentBucketClient
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration._
 import scala.List
 import scala.Some
 import domain.Post
-import dao.PostDao
+import dao.{TagDao, CommentDao, PostDao}
+import scala.collection.JavaConversions._
 
-object PostHelper{
+object DomainEntityGenerator{
 
   def generatePublishedPosts(amount: Int): List[Post] = {
     generateDrafts(amount) map (post => post.copy(isDraft = false))
@@ -46,13 +47,25 @@ object PostHelper{
 
   def generateUid = UUID.randomUUID().toString
 
+  def createComment(id: String, postId: String) = {
+    createCommentWithoutId(postId).copy(id = Some(id))
+  }
+
+  def createCommentWithoutId(postId: String) = {
+    Comment(postId = postId,
+      body = "test comment body",
+      authorName = "test name",
+      authorPic = "http://some.thi.ng",
+      authorUid = "test_UID"
+    )
+  }
+
+
   def main(args: Array[String]){
     implicit val ec = ExecutionContext.Implicits.global
 
-    try {
-      Await.result(new PostDao().bucket.flush(), 15 seconds)
-    } catch {
-      case e: UnsupportedOperationException => println(e.getMessage)
-    }
+      new PostDao().bucket.flush()
+      new CommentDao().bucket.flush()
+      new TagDao().bucket.flush()
   }
 }

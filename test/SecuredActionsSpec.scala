@@ -2,7 +2,7 @@ import controllers.{ImageController, PostController}
 import dao.PostDao
 import domain.Post
 import play.api.libs.Files.TemporaryFile
-import play.api.libs.iteratee.{Input, Step}
+import play.api.libs.iteratee.Input
 import play.api.libs.json.JsValue
 import play.api.mvc.MultipartFormData.{BadPart, MissingFilePart, FilePart}
 import play.api.mvc.{MultipartFormData, Request, Result, Results}
@@ -11,15 +11,16 @@ import play.api.test.Helpers._
 import org.scalatestplus.play._
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
-import util.{JsonPostTransformer, PostHelper}
+import util.{SpringContextHelper, JsonPostTransformer, DomainEntityGenerator}
 import scala.concurrent.ExecutionContext.Implicits.global
-import domain.DomainJsonFormats._
+import domain.JsonFormats._
 
 class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
 
   private def errorMessage = "{\"error\":\"Credentials required\"}"
 
-  private val postDao = new PostDao
+  val context = SpringContextHelper.springContext
+  private val postDao: PostDao = context.getBean(classOf[PostDao])
 
   "Secured Actions" should {
     "allow access to index page for unauthorized users" in {
@@ -35,7 +36,7 @@ class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
     "allow access to post page for unauthorized users" in {
       val uid = "controller_test_uid"
       val postTitle = "Sample Post Title for controller test"
-      val post = PostHelper.createPublishedPost.copy(id = Some(uid), title = postTitle)
+      val post = DomainEntityGenerator.createPublishedPost.copy(id = Some(uid), title = postTitle)
 
       savePostByKey(uid, post)
 
@@ -87,7 +88,7 @@ class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
     "restrict access to post creation [createPost]" in {
       val controller = Global.getControllerInstance(classOf[PostController])
 
-      val postJson = JsonPostTransformer.buildSirTrevorBlocks(PostHelper.createBlankPost)
+      val postJson = JsonPostTransformer.buildSirTrevorBlocks(DomainEntityGenerator.createBlankPost)
       val jsonPostRequest: Request[JsValue] = FakeRequest("POST", "/post").withBody(postJson).withHeaders(("Content-Type", "application/json"))
 
       val result: Future[Result] = controller.createPost.apply(jsonPostRequest)
@@ -98,7 +99,7 @@ class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
     //    PATCH         /post/:uid            @controllers.Application.updatePost(uid)
     "restrict access to post updating [updatePost(uid)]" in {
       val controller = Global.getControllerInstance(classOf[PostController])
-      val postJson = JsonPostTransformer.buildSirTrevorBlocks(PostHelper.createBlankPost)
+      val postJson = JsonPostTransformer.buildSirTrevorBlocks(DomainEntityGenerator.createBlankPost)
       val jsonPostRequest: Request[JsValue] = FakeRequest("POST", "/post").withBody(postJson).withHeaders(("Content-Type", "application/json"))
 
       val result: Future[Result] = controller.updatePost("fake_uid").apply(jsonPostRequest)
