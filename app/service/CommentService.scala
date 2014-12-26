@@ -4,8 +4,8 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import dao.CommentDao
 import domain.Comment
-import play.api.libs.json.{JsError, JsValue}
-import util.IdGenerator
+import play.api.libs.json.{Json, JsError, JsValue}
+import util.{StringAndDateUtils, IdGenerator}
 import java.util.Date
 import play.api.Logger
 import metrics.ApplicationMetrics._
@@ -29,7 +29,7 @@ class CommentService(commentDao: CommentDao) {
     comments
   }
 
-  def createComment(json: JsValue): Either[String,String] = {
+  def createComment(json: JsValue): Either[String,JsValue] = {
     logger.info("Creating review from JSON")
 
     val validatedJson = json.validate[Comment]
@@ -41,12 +41,13 @@ class CommentService(commentDao: CommentDao) {
 
         val generatedId = IdGenerator.generateUUID
         val dateAsMillis = new Date().getTime
+        val displayedDate = StringAndDateUtils.getCurrentDateAsString
 
-        val newComment = comment.copy(id = Some(generatedId), timestamp = Some(dateAsMillis))
+        val newComment = comment.copy(id = Some(generatedId), timestamp = Some(dateAsMillis), displayedDate = displayedDate)
 
         commentDao.save(generatedId, newComment)
 
-        Right(generatedId)
+        Right(Json.toJson(newComment))
       }
     )
   }
@@ -57,12 +58,13 @@ class CommentService(commentDao: CommentDao) {
       errors => {
         Left(JsError.toFlatJson(errors).toString())
       },
-      review => {
-        if(exists(commentId)){
-          commentDao.save(commentId, review)
-          Right(s"Comment with id ${review.id.get} updated")
+      comment => {
+        val dbComment = getById(commentId)
+        if(dbComment.isDefined){
+          commentDao.save(commentId, dbComment.get.copy(body = comment.body))
+          Right(s"Comment with id ${comment.id.get} updated")
         } else {
-          Left(s"Comment with id ${review.id.get} not found!")
+          Left(s"Comment with id ${comment.id.get} not found!")
         }
       }
     )
@@ -72,8 +74,8 @@ class CommentService(commentDao: CommentDao) {
     commentDao.delete(reviewId)
   }
 
-  def exists(key: String): Boolean = {
-    Await.result(commentDao.get(key), 5 seconds).isDefined
+  def getById(key: String) = {
+    Await.result(commentDao.get(key), 5 seconds)
   }
   
   def getCommentsByAuthor(uid: String): List[Comment] = ???

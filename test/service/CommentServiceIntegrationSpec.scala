@@ -65,8 +65,8 @@ class CommentServiceIntegrationSpec extends FunSpec with Matchers with BeforeAnd
 
       foundComments.isEmpty shouldEqual false
       foundComments.size shouldEqual 21
-      foundComments.head.id shouldEqual comments.last.id //saved last shown first
-      foundComments.last.id shouldEqual comments.head.id //saved first shown last
+      foundComments.head.id shouldEqual comments.head.id //saved first shown first
+      foundComments.last.id shouldEqual comments.last.id //saved last shown last
 
       comments foreach deleteComment
 
@@ -82,7 +82,8 @@ class CommentServiceIntegrationSpec extends FunSpec with Matchers with BeforeAnd
       val  result = commentService.createComment(Json.toJson(comment))
 
       result.isRight shouldEqual true
-      val id = result.right.get
+      val jsonComment = Json.fromJson[Comment](result.right.get)
+      val id = jsonComment.get.id.get
       keys.enqueue(id)
 
       val foundComment = getById(id)
@@ -102,7 +103,8 @@ class CommentServiceIntegrationSpec extends FunSpec with Matchers with BeforeAnd
       val  result = commentService.createComment(Json.toJson(comment))
 
       result.isRight shouldEqual true
-      val id = result.right.get
+      val jsonComment = Json.fromJson[Comment](result.right.get)
+      val id = jsonComment.get.id.get
       keys.enqueue(id)
 
       val foundComment = getById(id)

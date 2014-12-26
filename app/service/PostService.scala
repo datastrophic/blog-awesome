@@ -2,7 +2,7 @@ package service
 
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
-import dao.{TagDao, PostDao}
+import dao.{CommentDao, TagDao, PostDao}
 import domain.{ViewPage, PostPreview, Post}
 import play.api.libs.json.JsValue
 import util.{StringAndDateUtils, JsonPostTransformer}

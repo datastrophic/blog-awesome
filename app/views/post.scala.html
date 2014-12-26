@@ -13,7 +13,7 @@
 
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/gist-embed/gist-embed.js")'></script>
-
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/comments.css")'>
 
         <!-- Page Content -->
         <div class="container">
@@ -56,43 +56,35 @@
                         }
                     }
                     <hr>
+                </div>
 
-                        <!-- Blog Comments -->
+                    <div class="row">
+                        <div class="col-md-10 col-md-offset-1">
+                            <div class="widget">
+                                <div class="panel-heading">
+                                    <h3><small><i class="glyphicon glyphicon-comment"></i></small>&nbsp;&nbsp;&nbsp;Comments</h3>
+                                </div>
 
-                        <!-- Comments Form -->
-
-                    @*
-
-                    <div class="well">
-                        <h4>Leave a Comment:</h4>
-                        <form role="form">
-                            <div class="form-group">
-                                <textarea class="form-control" rows="3"></textarea>
+                            <!-- Posted Comments -->
+                            <div class="panel-body">
+                                <ul class="list-group" id="comments">
+                            <!-- Comment -->
+                                </ul>
                             </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    </div>
 
-                    <hr> *@
-
-                        <!-- Posted Comments -->
-                    @for(comment <- post.comments){
-                        <!-- Comment -->
-                        <div class="media">
-                            <a class="pull-left" href="#">
-                                <img class="media-object" src="http://placehold.it/64x64" alt="">
-                            </a>
-                            <div class="media-body">
-                                <h4 class="media-heading">Start Bootstrap
-                                    <small>August 25, 2014 at 9:30 PM</small>
-                                </h4>
-                                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                            <div class="well-sm">
+                                <h5>Leave a Comment:</h5>
+                                    <div class="form-group">
+                                        <textarea id="comment-text" class="form-control" rows="5"></textarea>
+                                    </div>
+                                @if(user.isDefined) {
+                                    <button id="submit-comment" type="submit" class="btn btn-sm">Submit</button>
+                                } else {
+                                    <button data-toggle="modal" data-target="#loginModal" class="btn btn-sm">Login to leave comment</button>
+                                }
                             </div>
                         </div>
-                    }
-
-
-                </div>
+                    </div>
 
                 </div>
             <hr>
@@ -107,6 +99,130 @@
                     $self.replaceWith(markdown.toHTML($self.text()))
                 });
 
+                @if(user.isDefined) {
+                    window.viewerId = "@play.twirl.api.Html(user.get.id)"
+                }
+
+
+                $("#submit-comment" ).click(function(){
+
+                    var commentData = {
+                        body: $('#comment-text').val()
+                        @if(user.isDefined) {
+                            , authorPic : "@play.twirl.api.Html(user.get.profile.avatarUrl.getOrElse("http://placehold.it/80"))",
+                            authorName : "@play.twirl.api.Html(user.get.profile.firstName.getOrElse("") + " " + user.get.profile.lastName.getOrElse(""))",
+                            authorUid : "@play.twirl.api.Html(user.get.id)",
+                            postId : "@play.twirl.api.Html(post.id.get)"
+                        }
+                    };
+
+                    $.ajax({
+                            url : "/comment",
+                            type: "POST",
+                    data: JSON.stringify(commentData),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                        success: function(data){
+                            $('#comment-text').val('')
+                            displayComment(data)
+                        }
+                    });
+                });
+
+                function displayComment(comment){
+                    var actionDiv = "";
+                    if(window.viewerId === comment.authorUid){
+                        actionDiv =  "<div id='actions-"+comment.id+"'class='pull-right'>"+
+                            "<a id='edit-"+comment.id+"' href='javascript:editComment(\""+comment.id+"\");'>"+
+                            "  <small><i class='fa fa-pencil-square-o'></i></small>"+
+                            "</a>"+
+                            "<a id='delete-"+comment.id+"' href='javascript:deleteComment(\""+comment.id+"\");'>"+
+                            "    <small><i class='fa fa-trash-o'></i></small>"+
+                            "</a>"+
+                            "<a style='display: none;' id='done-"+comment.id+"' href='javascript:updateComment(\""+comment.id+"\");'>"+
+                            "  <small><i class='fa fa-check-circle-o'></i></small>"+
+                            "</a>"
+                            "</div>"
+                    }
+
+                    var commentDiv = $(
+                        "<li id='comment-"+comment.id+"'class='list-group-item'>"+
+                        "<div class='row'>"+
+                        "<div class='col-xs-2 col-md-1'>"+
+                        "<img src='"+comment.authorPic+"' class='img-circle img-responsive'/></div>"+
+                        "<div class='col-xs-10 col-md-11'>"+
+                        "<div>"+
+                        "<div class='mic-info'>"+
+                        "<b>"+comment.authorName+"</b> <small>on "+ comment.displayedDate+"</small>"+
+                        "</div>"+
+                        "</div>"+
+                        "<div id='"+comment.id+"' class='comment-text'>"+ comment.body +
+                        "</div>"+ actionDiv +
+                        "</div>"+
+                        "</div>"+
+                        "</li>"
+                    );
+
+                    $("#comments").append(commentDiv);
+                }
+
+                $.getJSON( "/comment/post/@{post.id.get}" , function( data ) {
+                    $.each( data, function( key, comment ) {
+                        displayComment(comment)
+                    });
+                });
+
+
+                window.editComment = function(id){
+                    var body = $("#"+id).text()
+                    $("#"+id).replaceWith( "<div><textarea id='edit-text-"+id+"' class='form-control' rows='5'></textarea></div>" );
+                    $("#edit-text-"+id).val(body)
+
+                    $("#delete-"+id).toggle()
+                    $("#edit-"+id).toggle()
+                    $("#done-"+id).toggle()
+
+                }
+
+                window.updateComment = function(id){
+                    var commentData = {
+                            body: $('#edit-text-'+id).val(),
+                            id: id
+                        @if(user.isDefined) {
+                            , authorPic : "@play.twirl.api.Html(user.get.profile.avatarUrl.getOrElse("http://placehold.it/80"))",
+                            authorName : "@play.twirl.api.Html(user.get.profile.firstName.getOrElse("") + " " + user.get.profile.lastName.getOrElse(""))",
+                            authorUid : "@play.twirl.api.Html(user.get.id)",
+                            postId : "@play.twirl.api.Html(post.id.get)"
+                        }
+                    }
+
+                    $.ajax({
+                        url : "/comment/"+id,
+                        type: "PUT",
+                        data: JSON.stringify(commentData),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: 'json',
+                        success: function(data){
+                            $("#delete-"+id).toggle()
+                            $("#edit-"+id).toggle()
+                            $("#done-"+id).toggle()
+
+                            $("#edit-text-"+id).replaceWith("<div id='"+id+"' class='comment-text'>"+ commentData.body +
+                                "</div>")
+                            }
+                    })
+                }
+
+                window.deleteComment = function(id){
+                    $.ajax({
+                        url : "/comment/"+id,
+                        type: "DELETE",
+                        dataType: 'json',
+                        success: function(data){
+                            $("#comment-"+id ).remove()
+                        }
+                    });
+                }
             });
         </script>
     </body>

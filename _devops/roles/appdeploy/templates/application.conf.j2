@@ -18,7 +18,10 @@ image.system.path = "/opt/octopus/data/images"
 # You can also configure logback (http://logback.qos.ch/),
 # by providing an application-logger.xml file in the conf directory.
 
-couchbase.default.bucket={{ application.default_bucket }}
+couchbase.user.bucket=users
+couchbase.post.bucket=posts
+couchbase.tag.bucket=tags
+couchbase.comment.bucket=comments
 
 include "couchbase.conf"
 include "securesocial.conf"

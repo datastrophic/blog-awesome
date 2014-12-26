@@ -1,7 +1,5 @@
 @(implicit request: RequestHeader, lang: Lang, env: securesocial.core.RuntimeEnvironment[auth.SocialUser])
 
-
-
 <!-- Login popup -->
 <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm">
@@ -12,8 +10,8 @@
                     Login to leave comments</h3>
                 <div class="social-box">
                     <div class="row mg-btm">
-                        <div class="col-md-12">
-                            <a href="@env.routes.authenticationUrl("facebook", Some("/"))" class="btn btn-primary btn-block">
+                        <div class="col-md-12" id="facebook-login">
+                            <a id="facebook-href" href="@env.routes.authenticationUrl("facebook")" class="btn btn-primary btn-block" >
                                 <i class="fa fa-facebook visible-xs"></i>
                                 <i class="icon-facebook"></i>    Login with Facebook
                             </a>
@@ -21,7 +19,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <a href="@env.routes.authenticationUrl("twitter", Some("/"))" class="btn btn-info btn-block" >
+                            <a id="twitter-href" href="@env.routes.authenticationUrl("twitter")" class="btn btn-info btn-block" >
                                 <i class="fa fa-twitter visible-xs"></i>
                                 <i class="icon-twitter"></i>    Login with Twitter
                             </a>
@@ -32,3 +30,11 @@
         </div>
     </div>
 </div>
+<script>
+$(document).ready(function() {
+    var fb = "@env.routes.authenticationUrl("facebook")"
+    var twttr = "@env.routes.authenticationUrl("twitter")"
+    $("#facebook-href").attr("href", fb+"?redirectTo="+ $(location).attr('pathname'));
+    $("#twitter-href").attr("href", twttr+"?redirectTo="+ $(location).attr('pathname'));
+});
+</script>

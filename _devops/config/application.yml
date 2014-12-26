@@ -5,8 +5,10 @@ application:
   jmx_port: 9010
   webapp_ram: 1024
   couchbase_host: 192.168.100.10
-  default_bucket: octopus
   buckets:
-    - octopus
+    - users
+    - tags
+    - comments
+    - posts
 
 #    TODO: switch from default bucket

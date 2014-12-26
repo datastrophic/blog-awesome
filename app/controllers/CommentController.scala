@@ -6,7 +6,7 @@ import auth.{SecureSocialAuth, SocialUser}
 import service.{CommentService, PostService}
 import play.api.Logger
 import metrics.ApplicationMetrics._
-import domain.ViewPage
+import domain.{Comment, ViewPage}
 import play.api.libs.json.Json
 import domain.JsonFormats._
 
@@ -20,7 +20,7 @@ class CommentController(commentService: CommentService, override implicit val en
       case Left(errorMessage) =>
         logger.error(errorMessage)
         BadRequest(Json.obj("status" -> "KO", "message" -> errorMessage))
-      case Right(commentId) => Ok(Json.obj("status" -> "OK", "id" -> commentId))
+      case Right(comment) => Ok(comment)
     }
   }
 
@@ -38,9 +38,15 @@ class CommentController(commentService: CommentService, override implicit val en
     Ok(Json.obj("status" -> "OK", "message" -> s"Comment with id $commentId scheduled for deletion"))
   }
 
-  def getPostComments(postId: String)= SecuredAction{implicit request =>
+  def getPostComments(postId: String)= UserAwareAction{implicit request =>
     val comments = commentService.getCommentsByPostId(postId)
+//    val comments = getComments
     Ok(Json.toJson(comments))
+  }
+
+  private def getComments: List[Comment] = {
+    (1 to 5).map(i => Comment(id = Some(i+""), body = s"smart comment $i", authorPic = "http://placehold.it/80",
+      authorName = s"Commentor #$i", authorUid = s"uid_$i", postId = s"post_id_$i", displayedDate = Some("11 November 2014"))).toList
   }
 
 }
