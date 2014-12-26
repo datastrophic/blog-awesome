@@ -13,7 +13,7 @@
 
 - name: Configure main node
   shell: /opt/couchbase/bin/couchbase-cli cluster-init -u {{ admin_user }} -p {{ admin_password }} -c 127.0.0.1:8091 --cluster-port=8091 --cluster-ramsize={{ cluster_ram_quota }}
-#  when: couchbaseInstalled.stdout == '0'
+  when: couchbaseInstalled.stdout == '0'
 
 - name: Create shell script for configuring main node
   template: src=couchbase-add-node.j2 dest=/tmp/addnodes.sh mode=750
@@ -25,11 +25,6 @@
 
 - name: Rebalance the cluster
   shell: /opt/couchbase/bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u {{ admin_user }} -p {{ admin_password }}
-#  when: couchbaseInstalled.stdout == '0'
-
-#- name: Reading buckets configuration
-#  debug: msg="Bucket {{ item.key }} [ name = {{ item.value.name }}, ram_quota = {{ item.value.ram_quota }}, replica_number = {{ item.value.replica_number }}, enable_flush = {{ item.value.enable_flush }} ] found in configuration"
-#  with_dict: buckets
 #  when: couchbaseInstalled.stdout == '0'
 
 - name: Creating Buckets

@@ -10,5 +10,3 @@ application:
     - tags
     - comments
     - posts
-
-#    TODO: switch from default bucket

@@ -7,4 +7,4 @@
 
 #ansible-playbook playbook_prod.yml -vvvv -c ssh -u vagrant --private-key=~/.vagrant.d/insecure_private_key
 
-ansible-playbook octopus_prod.yml -i prodconfig/flyingoctopus/hosts.octopus -vvvv -c ssh -u ansible --private-key=~/.ssh/id_rsa
+ansible-playbook octopus_prod.yml -i prodconfig/flyingoctopus/hosts.octopus -vvvv -c ssh -u octopus --private-key=~/.ssh/id_rsa

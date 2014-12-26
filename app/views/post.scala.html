@@ -73,14 +73,14 @@
                             </div>
 
                             <div class="well-sm">
-                                <h5>Leave a Comment:</h5>
+                                <h5>Write a comment:</h5>
                                     <div class="form-group">
                                         <textarea id="comment-text" class="form-control" rows="5"></textarea>
                                     </div>
                                 @if(user.isDefined) {
                                     <button id="submit-comment" type="submit" class="btn btn-sm">Submit</button>
                                 } else {
-                                    <button data-toggle="modal" data-target="#loginModal" class="btn btn-sm">Login to leave comment</button>
+                                    <button id="login-button" data-toggle="modal" data-target="#loginModal" class="btn btn-sm">Login to post comment</button>
                                 }
                             </div>
                         </div>
@@ -93,6 +93,14 @@
         
         <script>
             $(document).ready(function() {
+
+                $('#comment-text').val(localStorage.getItem('temporaryCommentText'))
+                localStorage.removeItem('temporaryCommentText')
+
+
+                $("#login-button" ).click(function(){
+                    localStorage.setItem('temporaryCommentText', $('#comment-text').val())
+                })
 
                 $(".md-content" ).each(function(i){
                 var $self = $(this);
@@ -134,13 +142,13 @@
                     if(window.viewerId === comment.authorUid){
                         actionDiv =  "<div id='actions-"+comment.id+"'class='pull-right'>"+
                             "<a id='edit-"+comment.id+"' href='javascript:editComment(\""+comment.id+"\");'>"+
-                            "  <small><i class='fa fa-pencil-square-o'></i></small>"+
+                            "  <small><i class='fa fa-pencil-square-o fa-lg'></i></small>"+
                             "</a>"+
                             "<a id='delete-"+comment.id+"' href='javascript:deleteComment(\""+comment.id+"\");'>"+
-                            "    <small><i class='fa fa-trash-o'></i></small>"+
+                            "    <small><i class='fa fa-trash-o fa-lg'></i></small>"+
                             "</a>"+
                             "<a style='display: none;' id='done-"+comment.id+"' href='javascript:updateComment(\""+comment.id+"\");'>"+
-                            "  <small><i class='fa fa-check-circle-o'></i></small>"+
+                            "  <small><i class='fa fa-check-circle-o fa-lg'></i></small>"+
                             "</a>"
                             "</div>"
                     }
@@ -149,7 +157,8 @@
                         "<li id='comment-"+comment.id+"'class='list-group-item'>"+
                         "<div class='row'>"+
                         "<div class='col-xs-2 col-md-1'>"+
-                        "<img src='"+comment.authorPic+"' class='img-circle img-responsive'/></div>"+
+                         "<div class='navbar-avatar navbar-right' style=\"background-image: url('"+comment.authorPic+"');\"></div>"+
+                        "</div>"+
                         "<div class='col-xs-10 col-md-11'>"+
                         "<div>"+
                         "<div class='mic-info'>"+

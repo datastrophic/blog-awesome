@@ -2,17 +2,20 @@
 
 - hosts: all
   sudo: True
+  vars_prompt:
+      redeploy: Full redeploy or application only [full|app] ?
   vars_files:
     - config/couchbase.yml
   roles:
-    - role: common
-    - role: oracle-java
-    - role: couchbase
+    - { role: common, when: "redeploy != 'app'" }
+    - { role: oracle-java, when: "redeploy != 'app'" }
+    - { role: couchbase, when: "redeploy != 'app'" }
+
 
 - hosts: webapp
   sudo: True
   vars_prompt:
-      redeploy: Full redeploy or application only [full|app] ?
+      redeploy: Redeploy Nginx and Datadog [yes|no] ?
   vars_files:
     - config/couchbase.yml
     - config/application.yml
@@ -20,6 +23,6 @@
     - config/nginx.yml
     - config/securesocial.yml
   roles:
-    - { role: nginx, when: "redeploy != 'app'" }
+    - { role: nginx, when: "redeploy == 'yes'" }
     - role: appdeploy
-    - { role: datadog, when: "redeploy != 'app'" }
+    - { role: datadog, when: "redeploy == 'yes'" }

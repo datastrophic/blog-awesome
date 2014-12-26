@@ -23,7 +23,6 @@
     - "{{ application.application_home }}/conf/securesocial.conf"
     - "{{ application.application_home }}/conf/couchbase.conf"
     - "{{ application.application_home }}/conf/application.conf"
-    - "{{ application.application_home }}/conf/application.test.conf"
 
 - name: Copying SecureSocial configuration (overwrite)
   action: template src=securesocial.conf.j2 dest={{ application.application_home }}/conf/securesocial.conf

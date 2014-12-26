@@ -66,7 +66,8 @@
         </ul>
         <div class="navbar-right"></div>
             @if(user.isDefined){
-                <img height="40px" width="40px" src="@user.get.profile.avatarUrl.get" class="img-circle navbar-right" style="margin-top: 10px; margin-right: 10px;">
+                <div class="navbar-avatar navbar-right" style="background-image: url('@user.get.profile.avatarUrl.get'); margin-top: 10px; margin-right: 10px;"></div>
+                @* <img height="40px" width="40px" src="@user.get.profile.avatarUrl.get" class="logo-center img-circle navbar-right" style="">*@
             }
         @*
 

@@ -19,3 +19,14 @@ p {font-size: large}
     padding-left: 4px !important;
     padding-top: 4px !important;
 }
+
+.navbar-avatar {
+    width: 40px;
+    height: 40px;
+
+    background-size: cover;
+
+    background-position: center;
+
+    border-radius: 50%;
+}
