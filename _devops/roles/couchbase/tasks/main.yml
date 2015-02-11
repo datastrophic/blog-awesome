@@ -7,41 +7,45 @@
   get_url: url=http://packages.couchbase.com/releases/3.0.1/couchbase-server-community_3.0.1-ubuntu12.04_amd64.deb dest=~/.
   when: couchbaseInstalled.stdout == '0'
 
-- name: Install Couchbase .deb file on all machines
-  shell: dpkg -i ~/couchbase-server-community_3.0.1-ubuntu12.04_amd64.deb
+- name: install couchbase .deb
+  action: shell dpkg -i ~/couchbase-server-community_3.0.1-ubuntu12.04_amd64.deb
   when: couchbaseInstalled.stdout == '0'
 
-- name: Configure main node
-  shell: /opt/couchbase/bin/couchbase-cli cluster-init -u {{ admin_user }} -p {{ admin_password }} -c 127.0.0.1:8091 --cluster-port=8091 --cluster-ramsize={{ cluster_ram_quota }}
+- name: cluster-init
+  action: shell /opt/couchbase/bin/couchbase-cli cluster-init -u {{ admin_user }} -p {{ admin_password }} -c {{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8091 --cluster-port=8091 --cluster-ramsize={{ cluster_ram_quota }}
+  register: result
+  until: result.stdout.find("SUCCESS") != -1
+  retries: 10
+  delay: 5
   when: couchbaseInstalled.stdout == '0'
 
-- name: Create shell script for configuring main node
+- name: add-nodes template script
   template: src=couchbase-add-node.j2 dest=/tmp/addnodes.sh mode=750
-#  when: couchbaseInstalled.stdout == '0'
+  when: couchbaseInstalled.stdout == '0'
 
-- name: Launch config script
+- name: running add-nodes
   action: shell /tmp/addnodes.sh
-#  when: couchbaseInstalled.stdout == '0'
+  when: couchbaseInstalled.stdout == '0'
 
-- name: Rebalance the cluster
-  shell: /opt/couchbase/bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u {{ admin_user }} -p {{ admin_password }}
-#  when: couchbaseInstalled.stdout == '0'
+- name: rebalancing the cluster
+  shell: /opt/couchbase/bin/couchbase-cli rebalance -c {{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8091 -u {{ admin_user }} -p {{ admin_password }}
+  when: couchbaseInstalled.stdout == '0'
 
-- name: Creating Buckets
-  shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket={{ item.value.name }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ item.value.ram_quota }}  --bucket-replica={{ item.value.replica_number }} -u {{ admin_user }} -p {{ admin_password }} --enable-flush={{ item.value.enable_flush }}
+- name: creating buckets
+  shell: /opt/couchbase/bin/couchbase-cli bucket-create -c {{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8091 --bucket={{ item.value.name }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ item.value.ram_quota }}  --bucket-replica={{ item.value.replica_number }} -u {{ admin_user }} -p {{ admin_password }} --enable-flush={{ item.value.enable_flush }}
   with_dict: buckets
-#  when: couchbaseInstalled.stdout == '0'
+  when: couchbaseInstalled.stdout == '0'
 
 - name: Copying Views
   copy: src={{ item }} dest=/tmp/couchbase/views/
   with_fileglob:
         - views/*.json
-#  when: couchbaseInstalled.stdout == '0'
+  when: couchbaseInstalled.stdout == '0'
 
 
 - name: Uploading views
-  shell: "curl -X PUT -H 'Content-Type: application/json' http://{{ admin_user }}:{{ admin_password }}@localhost:8092/{{ item.1 }}/_design/{{ item.0.docname }} -d @/tmp/couchbase/views/{{ item.0.file }}"
+  shell: "curl -X PUT -H 'Content-Type: application/json' http://{{ admin_user }}:{{ admin_password }}@{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8092/{{ item.1 }}/_design/{{ item.0.docname }} -d @/tmp/couchbase/views/{{ item.0.file }}"
   with_subelements:
        - design_docs
        - buckets
-#  when: couchbaseInstalled.stdout == '0'
+  when: couchbaseInstalled.stdout == '0'

@@ -30,7 +30,7 @@ class CommentService(commentDao: CommentDao) {
   }
 
   def createComment(json: JsValue): Either[String,JsValue] = {
-    logger.info("Creating review from JSON")
+    logger.info("Creating comment from JSON")
 
     val validatedJson = json.validate[Comment]
     validatedJson.fold(
@@ -70,8 +70,12 @@ class CommentService(commentDao: CommentDao) {
     )
   }
 
-  def deleteComment(reviewId: String){
-    commentDao.delete(reviewId)
+  def deleteComment(commentId: String){
+    commentDao.delete(commentId)
+  }
+  
+  def deleteCommentsByPostId(postId: String){
+    getCommentsByPostId(postId).foreach(c => deleteComment(c.id.get))
   }
 
   def getById(key: String) = {

@@ -31,9 +31,9 @@ class CommentServiceIntegrationSpec extends FunSpec with Matchers with BeforeAnd
       val postId = "test_post_id"
       val comments = (1 to 10).map(num => DomainEntityGenerator.createComment(s"uid_$num", postId))
 
-      comments foreach { review =>
+      comments foreach { comment =>
         val time = new Date().getTime
-        saveComment(review.copy(timestamp = Some(time)))
+        saveComment(comment.copy(timestamp = Some(time)))
         Thread.sleep(2)
       }
 
@@ -55,9 +55,9 @@ class CommentServiceIntegrationSpec extends FunSpec with Matchers with BeforeAnd
       val postId = "test_post_id"
       val comments = (1 to 21).map(num => DomainEntityGenerator.createComment(s"uid_$num", postId))
 
-      comments foreach { review =>
+      comments foreach { comment =>
         val time = new Date().getTime
-        saveComment(review.copy(timestamp = Some(time)))
+        saveComment(comment.copy(timestamp = Some(time)))
         Thread.sleep(2)
       }
 
@@ -96,7 +96,7 @@ class CommentServiceIntegrationSpec extends FunSpec with Matchers with BeforeAnd
 
       getById(id) shouldEqual None
     }
-    it("correctly update review from Json") {
+    it("correctly update comment from Json") {
       val postId = "test_post_id"
 
       val comment = DomainEntityGenerator.createCommentWithoutId(postId = postId)
@@ -131,17 +131,17 @@ class CommentServiceIntegrationSpec extends FunSpec with Matchers with BeforeAnd
     saveCommentByKey(comment.id.get, comment)
   }
 
-  private def deleteComment(review: Comment) = {
-    deleteByKey(review.id.get)
+  private def deleteComment(comment: Comment) = {
+    deleteByKey(comment.id.get)
   }
 
   private def getById(uid: String) = {
     Await.result(commentDao.get(uid), 5 seconds)
   }
 
-  private def saveCommentByKey(key: String, review: Comment) = {
+  private def saveCommentByKey(key: String, comment: Comment) = {
     keys.enqueue(key)
-    Await.result(commentDao.save(key, review), 5 seconds)
+    Await.result(commentDao.save(key, comment), 5 seconds)
   }
 
   private def deleteByKey(key: String) = {

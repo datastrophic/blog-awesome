@@ -31,7 +31,7 @@ class ApplicationConfig extends FunctionalConfiguration {
   }
 
   val postService = bean(){
-    new PostService(postDao(), tagDao())
+    new PostService(postDao(), tagDao(), commentService())
   }
 
   val secureSocialUserService = bean(){
@@ -62,10 +62,5 @@ class ApplicationConfig extends FunctionalConfiguration {
 
   val tagController = bean(){
     new TagController(tagDao(), runtimeEnvironment())
-  }
-
-  val utilController = bean(){
-    implicit val runtimeEnv = runtimeEnvironment()
-    new UtilController
   }
 }

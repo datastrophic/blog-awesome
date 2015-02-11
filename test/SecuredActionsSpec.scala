@@ -28,7 +28,7 @@ class SecuredActionsSpec extends PlaySpec with Results with OneAppPerSuite{
       val result = controller.index(None).apply(FakeRequest())
 
       val bodyText: String = contentAsString(result)
-      bodyText.contains("<title>Flying Octopus</title>") mustBe true
+      bodyText.contains("<title>Blog Awesome</title>") mustBe true
 
       bodyText.contains("New Post") mustBe false
       bodyText.contains("Drafts") mustBe false

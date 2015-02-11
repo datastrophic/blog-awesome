@@ -1,4 +1,4 @@
 #Nginx
 nginx:
   domain_name: flyingoctopus.io
-  app_data_dir: /opt/octopus/data
+  app_data_dir: /opt/blog-awesome/data

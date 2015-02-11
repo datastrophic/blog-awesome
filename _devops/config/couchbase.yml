@@ -23,7 +23,7 @@ buckets:
       enable_flush: 1
   posts:
       name: posts
-      ram_quota: 512
+      ram_quota: 256
       replica_number: 0
       enable_flush: 1
 

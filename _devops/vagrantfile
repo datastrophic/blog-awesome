@@ -8,7 +8,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   base_box = "ubuntu/trusty64"
 
-  config.vm.define :octopus do |master|
+  config.vm.define :blog_awesome do |master|
     master.vm.box = base_box
     master.vm.network :private_network, ip: "192.168.100.10"
     master.vm.hostname = "master"
@@ -19,5 +19,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "playbook_dev.yml"
+    ansible.verbose = "vvv"
   end
 end

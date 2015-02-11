@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import domain.JsonFormats._
 
 
-class PostService(postDao: PostDao, tagDao: TagDao) {
+class PostService(postDao: PostDao, tagDao: TagDao, commentService: CommentService) {
 
   private val logger = Logger("[PostService]")
 
@@ -72,6 +72,7 @@ class PostService(postDao: PostDao, tagDao: TagDao) {
   def deletePostById(uid: String) = {
     logger.info(s"Deleting post by uid [$uid]")
     postDao.delete(uid)
+    commentService.deleteCommentsByPostId(uid)
   }
 
   private def getPostPreviews(awaitablePosts: Future[List[Post]]): List[PostPreview] = {
