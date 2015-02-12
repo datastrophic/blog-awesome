@@ -32,7 +32,7 @@ git clone git@github.com:akirillov/blog-awesome.git
 ```
 Run `vagrant up` from `_devops` directory in a cloned project. After virtual machine is created run `sbt run` from project root directory.
 
-Head to [localhost:9000](http://localhost:9000) with your browser and login with Facebook or Twitter.
+Head to [localhost:9000](http://localhost:9000) with your browser and login with Facebook or Twitter ('>_' button in navbar).
 
 Set access rights for your account in order to create/read/update/delete posts with **blog-awesome**. Head to [192.168.100.10:8091](http://192.168.100.10:8091) Couchbase web console and login with default `admin:password` creds. Locate your account in `users` bucket and change `isAdmin` field to `true`. (_automation for this step is not yet available_)
 
