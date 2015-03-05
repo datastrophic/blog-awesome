@@ -32,7 +32,7 @@ git clone git@github.com:akirillov/blog-awesome.git
 ```
 Run `vagrant up` from `_devops` directory in a cloned project. After virtual machine is created run `sbt run` from project root directory.
 
-Head to [localhost:9000](http://localhost:9000) with your browser and login with Facebook or Twitter.
+Head to [localhost:9000](http://localhost:9000) with your browser and login with Facebook or Twitter ('>_' button in navbar).
 
 Set access rights for your account in order to create/read/update/delete posts with **blog-awesome**. Head to [192.168.100.10:8091](http://192.168.100.10:8091) Couchbase web console and login with default `admin:password` creds. Locate your account in `users` bucket and change `isAdmin` field to `true`. (_automation for this step is not yet available_)
 
@@ -40,10 +40,10 @@ Relogin to **blog-awesome** at [localhost:9000](http://localhost:9000): you now 
 
 ### Development environment and production deployment
 In case you're totally new to Play! Framework and Ansible here is some links to start with:
- - Ansible playbooks
- - Vagrant Ansible provisioning
- - Couchbase buckets and views
- - ReactiveCouchbase client which is used 
+ - [Ansible playbooks][dev1]
+ - [Vagrant Ansible provisioning][dev2]
+ - Couchbase [buckets][dev3], [views][dev4] and [CLI][dev5] reference
+ - [ReactiveCouchbase][dev6] Scala client which is used 
 
 Hosts provisioning is performed with Ansible and development environment setup is made with help of Vagrant.
 If you're already familiar with Vagrant and Ansible, then take a look at set of roles and configurations at `_devops` directory.
@@ -81,7 +81,7 @@ design_docs:
     file: comment_views.json
     buckets:
       - comments
-      ```
+ ```
 * `datadog.yml` - you DataDog key for setting up proper monitoring and metrics domain to use with dashboards
 * `nginx.yml` contains only domain name and path to data directory from where static content is served
 * `securesocial.yml` contains `id's` and `tokens` for each supported provider. The values provided are targeted at localhost and must be modified in case you're going to prod. Here is SecureSocial [docs](http://securesocial.ws/guide/configuration.html)
@@ -102,3 +102,9 @@ design_docs:
  [d2]: https://www.virtualbox.org/
  [d3]: http://www.scala-sbt.org/download.html
  [d4]: http://docs.ansible.com/intro_installation.html
+ [dev1]: http://docs.ansible.com/playbooks.html
+ [dev2]: http://docs.vagrantup.com/v2/provisioning/ansible.html
+ [dev3]: http://docs.couchbase.com/admin/admin/UI/ui-data-buckets.html
+ [dev4]: http://docs.couchbase.com/admin/admin/Views/views-intro.html
+ [dev5]: http://docs.couchbase.com/admin/admin/cli-intro.html
+ [dev6]: http://reactivecouchbase.org/
