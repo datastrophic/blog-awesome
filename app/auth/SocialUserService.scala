@@ -1,11 +1,13 @@
 package auth
 
 import db.{UserBucketClient, ReactiveCouchbaseClient}
+import play.api.Mode
 import securesocial.core.services.{SaveMode, UserService}
 import securesocial.core.providers.MailToken
 import scala.concurrent.{ExecutionContext, Future}
 import securesocial.core.{BasicProfile, PasswordInfo}
 import util.IdGenerator
+import play.api.Play.current
 
 class SocialUserService extends UserService[SocialUser] with UserBucketClient{
 
@@ -26,7 +28,10 @@ class SocialUserService extends UserService[SocialUser] with UserBucketClient{
       if(user.isDefined) user.get
 
       else{
-        val newUser = SocialUser(uid, profile, isAdmin = false, List(profile))
+
+        play.api.Play.application.mode
+
+        val newUser = SocialUser(uid, profile, isAdmin = { play.api.Play.application.mode != Mode.Prod }, List(profile))
 
         executeWithBucket(bucket =>
           bucket.set[SocialUser](uid, newUser)
