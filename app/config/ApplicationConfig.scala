@@ -63,4 +63,8 @@ class ApplicationConfig extends FunctionalConfiguration {
   val tagController = bean(){
     new TagController(tagDao(), runtimeEnvironment())
   }
+
+  val siteMapController = bean(){
+    new SiteMapController(postDao())
+  }
 }

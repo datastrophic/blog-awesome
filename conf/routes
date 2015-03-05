@@ -9,7 +9,7 @@ GET           /webjars/*file               controllers.WebJarAssets.at(file)
 
 #Some SEO stuff
 GET           /robots.txt                  controllers.Assets.at(path="/public", file="robots.txt")
-#GET           /sitemap.xml                 @controllers.PostController.index(page: Option[Int])
+GET           /sitemap.xml                 @controllers.SiteMapController.getSiteMap
 
 # Home page
 GET           /                            @controllers.PostController.index(page: Option[Int])
