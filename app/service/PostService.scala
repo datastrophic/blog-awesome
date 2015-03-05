@@ -143,6 +143,7 @@ class PostService(postDao: PostDao, tagDao: TagDao, commentService: CommentServi
 
       tagDao.mergeTags(post.tags) //! happens only when post is being published to minimize amount of trash tags
 
+
       logger.info(s"Post with uid [$uid] published")
       couchbaseWriteRequests.mark()
       context.stop()

@@ -130,6 +130,37 @@ class PostDaoSpec extends FunSpec with PostBucketClient with Matchers with Befor
 
       foundPosts.size shouldEqual 0
     }
+    it("properly get published post ids for sitemap"){
+      val tid0 = "sitemap_0"
+      val tid1 = "sitemap_1"
+      val tid2 = "sitemap_2"
+
+      val posts = List(
+        (tid0, DomainEntityGenerator.createDraftPost.copy(id = Some(tid0))),
+        (tid1, DomainEntityGenerator.createPublishedPost.copy(id = Some(tid1))),
+        (tid2, DomainEntityGenerator.createPublishedPost.copy(id = Some(tid2)))
+      )
+
+      posts.foreach(post => {
+        Await.result(postDao.save(post._1, post._2), 5 seconds)
+        keys.enqueue(post._1)
+      })
+
+      val expectedIds = Await.result(postDao.getSitemapIds, 5 seconds)
+
+      expectedIds.size shouldEqual 2
+      expectedIds.contains(tid0)  shouldEqual false
+      expectedIds.contains(tid1)  shouldEqual true
+      expectedIds.contains(tid2)  shouldEqual true
+
+      posts.foreach(post => Await.result(postDao.delete(post._1), 5 seconds))
+
+      val deletedDrafts = Await.result(postDao.findDrafts(1), 5 seconds)
+      deletedDrafts.size shouldEqual 0
+
+      val deletedPublishedPosts = Await.result(postDao.findSubmittedPosts(1), 5 seconds)
+      deletedPublishedPosts.size shouldEqual 0
+    }
   }
 
   override protected def afterAll(): Unit = {

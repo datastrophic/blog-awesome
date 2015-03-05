@@ -1,6 +1,8 @@
 package service
 
 import domain.{DataBlock, PostPreview, ViewPage, Post}
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import util.{SpringContextHelper, StringAndDateUtils, DomainEntityGenerator}
@@ -12,7 +14,7 @@ import domain.JsonFormats._
 import org.scalatest.{BeforeAndAfterEach, BeforeAndAfterAll, Matchers, FunSpec}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
+@RunWith(classOf[JUnitRunner])
 class PostServiceIntegrationSpec extends FunSpec with Matchers with BeforeAndAfterAll{
 
   private val keys = new ConcurrentLinkedQueue[String]()

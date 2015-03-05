@@ -30,3 +30,7 @@ p {font-size: large}
 
     border-radius: 50%;
 }
+
+a {
+    color:#2C3E50 !important;
+}
