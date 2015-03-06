@@ -31,6 +31,16 @@ p {font-size: large}
     border-radius: 50%;
 }
 
-a {
-    color:#2C3E50 !important;
+.post-date {
+    color: #7B7C7E;
+}
+
+.ba-href[href]:hover {
+    color: #18bc9c;
+    text-decoration: none;
+}
+
+.ba-href[href] {
+    color: #2c3e50;
+
 }

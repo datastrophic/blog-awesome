@@ -19,11 +19,7 @@
     <div class="container">
 
         <div class="page-header" id="banner">
-            <div class="row">
-                <div class="col-md-12">
-                    <h1>[ <b>blog-awesome</b>: written in Scala, ready for scale and heavy loads ]</h1>
-                </div>
-            </div>
+                    &nbsp;
         </div>
 
         <div class="row">
@@ -32,17 +28,15 @@
             <div class="col-md-12">
                     @for(preview <- previews){
                         <h1>
-                            <a href="/post/@preview.id">@preview.title</a>
+                            <a href="/post/@preview.id" class="ba-href">@preview.title</a>
                         </h1>
-                        <p><small>
-                            @if(!preview.tags.isEmpty){
-                                <i class="fa fa-tags"></i>
-                            }
+                        <p class="post-date"><small>
+                            @preview.datePublished.toUpperCase on
+
                             @for(tag <- preview.tags){
-                                <a href="/post/tag/@tag" class="label label-default">@tag</a>
+                                <a href="/post/tag/@tag" class="ba-href">@tag</a>
                             }
                         </small></p>
-                        <p><small><span class="glyphicon glyphicon-time"></span> Posted on @preview.datePublished</small></p>
                         <hr>
                         @for(block <- preview.blocks){
                             @{
@@ -59,7 +53,7 @@
                                 }
                             }
                         }
-                        <a class="btn btn-primary" href="/post/@preview.id">continue <span class="glyphicon glyphicon-chevron-right"></span></a>
+                        <a class="ba-href" href="/post/@preview.id"><i class="fa fa-arrow-circle-right fa-3x"></i></a>
                         <hr>
                     }
 
@@ -77,9 +71,6 @@
             </div>
 
         </div>
-            <!-- /.row -->
-
-        <hr>
 
         @footer()
 
