@@ -3,11 +3,10 @@
 @import play.api.libs.json._
 @import play.api.libs.json
 
-
-    <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html>
-    @head()
+    @head(None)
 
     <body>
         <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/sirtrevor/sir-trevor.css")'>
@@ -23,7 +22,7 @@
         <div class="container">
             <div class="page-header" id="banner" style="padding-top: 60px;">
                 <div class="row">
-                    <div class="col-md-12 col-md-offset-1">
+                    <div class="col-md-12">
                         @if(title.isDefined){
                             <input id="postTitle" type="text" class="form-control input-lg" value="@title.getOrElse("")">
                         } else {
@@ -31,14 +30,14 @@
                         }
                         <hr>
                     </div>
-                    <div class="col-md-10 col-md-offset-1">
+                    <div class="col-md-12">
                         <div id="tag-list" class="tag-list"></div>
                     </div>
                 </div>
             </div>
             <div class="row">
                     <!-- Blog Post Content Column -->
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-12">
                     <form id="postForm">
                         <textarea id="postBody" class="js-sir-trevor-instance">@play.twirl.api.Html(body.getOrElse(""))</textarea>
                         <button type="submit" class="btn btn-default">Submit</button>

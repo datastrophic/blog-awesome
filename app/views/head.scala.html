@@ -1,5 +1,16 @@
+@(snippet: Option[domain.Snippet])
+@import domain.Snippet
+
 <head>
     <title>Blog Awesome</title>
+
+    @play.twirl.api.Html(
+        snippet.map(_.toHtml).getOrElse(
+         """<meta property="og:image" content="@routes.Assets.at("images/favicon.png")" />
+            |<meta property="og:title" content="Blog Awesome" />
+            |<meta property="og:description" content="WYSIWYG content editing engine for making perfect personal blogging without any stress" />""".stripMargin
+        )
+    )
 
     <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
     <link rel='stylesheet' href='@routes.Assets.at("stylesheets/external/login/login.css")'>
