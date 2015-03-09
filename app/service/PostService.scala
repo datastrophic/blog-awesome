@@ -1,9 +1,11 @@
 package service
 
+import com.typesafe.config.ConfigFactory
+
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
 import dao.{CommentDao, TagDao, PostDao}
-import domain.{ViewPage, PostPreview, Post}
+import domain.{Snippet, ViewPage, PostPreview, Post}
 import play.api.libs.json.JsValue
 import util.{StringAndDateUtils, JsonPostTransformer}
 import java.util.Date
@@ -16,6 +18,7 @@ import domain.JsonFormats._
 class PostService(postDao: PostDao, tagDao: TagDao, commentService: CommentService) {
 
   private val logger = Logger("[PostService]")
+  private val config = ConfigFactory.load()
 
   def getPostById(uid: String): Option[Post] = {
     logger.info(s"Attempting to get post by id [$uid]")
@@ -91,7 +94,9 @@ class PostService(postDao: PostDao, tagDao: TagDao, commentService: CommentServi
       val generatedUID = StringAndDateUtils.generateUID(p.title)
       val dateAsMillis = new Date().getTime
 
-      postDao.save(generatedUID, newPost.get.copy(id = Some(generatedUID), isDraft = true, displayedDate = StringAndDateUtils.getCurrentDateAsString, date = dateAsMillis))
+      val snippet = createSnippet(generatedUID, p)
+
+      postDao.save(generatedUID, p.copy(id = Some(generatedUID), isDraft = true, snippet = snippet, displayedDate = StringAndDateUtils.getCurrentDateAsString, date = dateAsMillis))
 
       logger.info(s"Post saved with uid [$generatedUID]")
       couchbaseWriteRequests.mark()
@@ -115,7 +120,9 @@ class PostService(postDao: PostDao, tagDao: TagDao, commentService: CommentServi
       getPostById(uid.trim) map { savedPost =>
         logger.info("Post for update found")
 
-        postDao.save(generatedUID, newPost.get.copy(id = Some(generatedUID), displayedDate = savedPost.displayedDate, date = savedPost.date))
+        val snippet = createSnippet(generatedUID, p)
+
+        postDao.save(generatedUID, p.copy(id = Some(generatedUID), snippet = snippet, displayedDate = savedPost.displayedDate, date = savedPost.date))
 
         if (uid != generatedUID) {
           postDao.delete(uid)
@@ -173,5 +180,26 @@ class PostService(postDao: PostDao, tagDao: TagDao, commentService: CommentServi
         }
       }
     }
+  }
+
+  private def createSnippet(uid: String, post: Post): Option[Snippet] = {
+    val imageBlocks = post.body.filter(_.`type` == "image")
+    val dataBlocks = post.body.filter(_.`type` == "text")
+
+    if(dataBlocks.size > 0){
+
+      val imgUrl = if(imageBlocks.size > 0){
+        imageBlocks.head.data
+      } else {
+        s"${config.getString("current.host")}/favicon.png"
+      }
+
+      val url = s"${config.getString("current.host")}/$uid"
+
+      Some(Snippet(imageUrl = imgUrl, title = post.title, description = dataBlocks.head.data, url = url))
+    } else {
+      None
+    }
+
   }
 }

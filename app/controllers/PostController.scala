@@ -4,7 +4,7 @@ import securesocial.core._
 import play.api.mvc.{BodyParsers, RequestHeader}
 import auth.{SecureSocialAuth, SocialUser}
 import play.api.libs.json.Json
-import domain.ViewPage
+import domain.{Post, Snippet, ViewPage}
 import util.JsonPostTransformer
 import service.PostService
 import play.api.Logger

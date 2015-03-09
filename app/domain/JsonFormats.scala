@@ -7,6 +7,7 @@ object JsonFormats {
 
   implicit val dataBlockFormat = Json.format[DataBlock]
   implicit val commentFormat= Json.format[Comment]
+  implicit val snippetFormat= Json.format[Snippet]
   implicit val previewFormat= Json.format[PostPreview]
   implicit val postFormat = Json.format[Post]
 

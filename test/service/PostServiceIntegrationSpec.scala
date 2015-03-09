@@ -1,5 +1,6 @@
 package service
 
+import com.typesafe.config.ConfigFactory
 import domain.{DataBlock, PostPreview, ViewPage, Post}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -23,6 +24,7 @@ class PostServiceIntegrationSpec extends FunSpec with Matchers with BeforeAndAft
 
   private val postDao: PostDao = context.getBean(classOf[PostDao])
   private val postService: PostService = context.getBean(classOf[PostService])
+  private val config = ConfigFactory.load()
 
   describe("Post Service"){
 
@@ -278,6 +280,82 @@ class PostServiceIntegrationSpec extends FunSpec with Matchers with BeforeAndAft
       emptyPageView.previous.get shouldEqual s"$sourceUrl?page=3"
 
       emptyPageView.next.isDefined shouldEqual false
+    }
+
+    it("correctly generate Snippet from JSON [saveJsonPost]"){
+
+      val title = "test title"
+
+      //Strings are used for testing because SirTrevor stores data in its own json format
+      //which is passed from frontend and then transformed into domain object
+      val sample =
+        s"""
+           |{"title":"$title","data":[
+                              |{"type":"text","data":{"text":"test text"}},
+                              |{"type":"image","data":{"file":{"url":"http://localhost:9000/images/kbr9i9970sq44m04gscu8p7v50.jpg"}}},
+                              |{"type":"gist","data":{"id":"00c4d337dbc5c9ea4cbc"}}
+                              |],"tags":["tag1","tag2","tag3"]}
+        """.stripMargin
+
+      val json: JsValue = Json.parse(sample)
+
+      val result = postService.saveJsonPost(json)
+      val expectedPost = getById(StringAndDateUtils.generateUID(title))
+
+      val expectedSnippet = expectedPost.get.snippet
+      expectedSnippet.isDefined shouldEqual true
+
+      val snippet = expectedSnippet.get
+
+      snippet.description shouldEqual "test text"
+      snippet.imageUrl shouldEqual "http://localhost:9000/images/kbr9i9970sq44m04gscu8p7v50.jpg"
+      snippet.title shouldEqual title
+      snippet.url shouldEqual  s"${config.getString("current.host")}/${StringAndDateUtils.generateUID(title)}"
+
+      deletePost(expectedPost.get)
+    }
+
+    it("correctly update Snippet on post update [updateExistingPost]"){
+      val title = "test title"
+      val generatedUid = StringAndDateUtils.generateUID(title)
+
+      val samplePost = DomainEntityGenerator.createBlankPost.copy(id = Some(generatedUid))
+
+      savePost(samplePost)
+
+      getById(generatedUid).isDefined shouldEqual true
+
+      val newTitle = "some other title"
+      val newGeneratedUid = StringAndDateUtils.generateUID(newTitle)
+
+      //Strings are used for testing because SirTrevor stores data in its own json format
+      //which is passed from frontend and then transformed into domain object
+      val updateSample =
+        s"""
+           |{"title":"$newTitle","data":[
+                                 |{"type":"text","data":{"text":"test text"}},
+                                 |{"type":"image","data":{"file":{"url":"http://localhost:9000/images/kbr9i9970sq44m04gscu8p7v50.jpg"}}},
+                                 |{"type":"gist","data":{"id":"00c4d337dbc5c9ea4cbc"}}
+                                 |],"tags":["tag1","tag2","tag3"]}
+        """.stripMargin
+
+      val json: JsValue = Json.parse(updateSample)
+
+
+      val result = postService.updateExistingPost(generatedUid, json)
+      val updatedPost = getById(newGeneratedUid)
+
+      val expectedSnippet = updatedPost.get.snippet
+      expectedSnippet.isDefined shouldEqual true
+
+      val snippet = expectedSnippet.get
+
+      snippet.description shouldEqual "test text"
+      snippet.imageUrl shouldEqual "http://localhost:9000/images/kbr9i9970sq44m04gscu8p7v50.jpg"
+      snippet.title shouldEqual newTitle
+      snippet.url shouldEqual  s"${config.getString("current.host")}/$newGeneratedUid"
+
+      deletePost(updatedPost.get)
     }
   }
 
