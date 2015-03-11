@@ -10,22 +10,23 @@
         @head(None)
 
     <body>
+
         @navbar(user)(None)(editMode = false)
 
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("markdown.js"))'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/external/gist-embed/gist-embed.js")'></script>
 
         <!-- Page Content -->
-    <div class="container">
+    <div class="container" style="min-height: 100%">
 
         <div class="page-header" id="banner">
                     &nbsp;
         </div>
 
-        <div class="row">
+        <div id="content" class="row">
 
                 <!-- Blog Entries Column -->
-            <div class="col-md-12">
+            <div class="col-md-10 col-md-offset-1">
                     @for(preview <- previews){
                         <h1>
                             <a href="/post/@preview.id" class="ba-href">@preview.title</a>
@@ -69,13 +70,10 @@
                 }
 
             </div>
-
         </div>
-
+    </div>
         @footer()
 
-    </div>
-        <!-- /.container -->
         <script>
         $(document).ready(function(){
 
@@ -84,7 +82,10 @@
                     $self.replaceWith(markdown.toHTML($self.text()))
                 });
 
+
+                adjustFooter();
          });
+
         </script>
     </body>
 

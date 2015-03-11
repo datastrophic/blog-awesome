@@ -44,3 +44,12 @@ p {font-size: large}
     color: #2c3e50;
 
 }
+
+.footer-href[href]:hover {
+    color: #18bc9c;
+    text-decoration: none;
+}
+
+.footer-href[href] {
+    color: #7B7C7E;
+}

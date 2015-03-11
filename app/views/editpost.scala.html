@@ -22,7 +22,7 @@
         <div class="container">
             <div class="page-header" id="banner" style="padding-top: 60px;">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-10 col-md-offset-1">
                         @if(title.isDefined){
                             <input id="postTitle" type="text" class="form-control input-lg" value="@title.getOrElse("")">
                         } else {
@@ -30,24 +30,24 @@
                         }
                         <hr>
                     </div>
-                    <div class="col-md-12">
+                    <div class="col-md-10 col-md-offset-1">
                         <div id="tag-list" class="tag-list"></div>
                     </div>
                 </div>
             </div>
             <div class="row">
                     <!-- Blog Post Content Column -->
-                <div class="col-md-12">
+                <div class="col-md-10 col-md-offset-1">
                     <form id="postForm">
                         <textarea id="postBody" class="js-sir-trevor-instance">@play.twirl.api.Html(body.getOrElse(""))</textarea>
-                        <button type="submit" class="btn btn-default">Submit</button>
+                        <button type="submit" class="btn btn-default" style="margin-bottom: 30px; margin-top: 10px;">Submit</button>
                     </form>
                 </div>
 
             </div>
-            <hr>
-            @footer()
         </div>
+
+        @footer()
 
         <script>
             new SirTrevor.Editor({
@@ -57,6 +57,27 @@
 
             SirTrevor.setDefaults({
                 uploadUrl: "/image"
+            });
+
+            SirTrevor.EventBus.on('block:create:new', function(){
+                adjustFooter();
+            });
+
+            SirTrevor.EventBus.on('block:create:existing', function(){
+                adjustFooter();
+            });
+
+            SirTrevor.EventBus.on('block:remove', function(){
+                adjustFooter();
+            });
+
+            SirTrevor.EventBus.on('block:reorder:dropped', function(){
+                adjustFooter();
+            });
+
+
+            SirTrevor.EventBus.on('formatter:hide', function(){
+                adjustFooter();
             });
         </script>
 
@@ -85,8 +106,9 @@
             $.getJSON( "/taglist", function( data ) {
                 tagsObject = $('#tag-list').tags({
                     tagData: postTags,
-                    suggestions: data,
+                    suggestions: data
                   });
+                adjustFooter();
             });
 
             function sendPostToServer() {
@@ -112,6 +134,8 @@
                         }
                     });
                 }
+
+                adjustFooter();
         });
         </script>
     </body>

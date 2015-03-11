@@ -19,7 +19,7 @@
         <div class="container">
             <div class="page-header" id="banner">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-10 col-md-offset-1">
                         <h1>@post.title</h1>
                             <!-- Date/Time -->
                         <p class="post-date"><small>
@@ -37,7 +37,7 @@
             <div class="row">
 
                     <!-- Blog Post Content Column -->
-                <div class="col-md-12">
+                <div class="col-md-10 col-md-offset-1">
                     @for(block <- post.body){
                         @if(block.`type` == "text") {
                             <p class="md-content">@{block.data}</p>
@@ -57,7 +57,7 @@
                 </div>
 
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-10 col-md-offset-1">
                             <div class="widget">
                                 <div class="panel-heading">
                                     <h3><small><i class="glyphicon glyphicon-comment"></i></small>&nbsp;&nbsp;&nbsp;Comments</h3>
@@ -85,10 +85,9 @@
                     </div>
 
                 </div>
-            <hr>
-          @footer()
         </div>
-        
+        </div>
+        @footer()
         <script>
             $(document).ready(function() {
 
@@ -98,19 +97,18 @@
 
                 $("#login-button" ).click(function(){
                     localStorage.setItem('temporaryCommentText', $('#comment-text').val())
-                })
-
-                $(".md-content" ).each(function(i){
-                var $self = $(this);
-                    $self.replaceWith(markdown.toHTML($self.text()))
                 });
 
                 @if(user.isDefined) {
                     window.viewerId = "@play.twirl.api.Html(user.get.id)"
                 }
 
+                $(".md-content" ).each(function(i){
+                var $self = $(this);
+                    $self.replaceWith(markdown.toHTML($self.text()))
+                });
 
-                $("#submit-comment" ).click(function(){
+            $("#submit-comment" ).click(function(){
 
                     var commentData = {
                         body: $('#comment-text').val()
@@ -131,6 +129,7 @@
                         success: function(data){
                             $('#comment-text').val('')
                             displayComment(data)
+                            adjustFooter();
                         }
                     });
                 });
@@ -177,6 +176,7 @@
                     $.each( data, function( key, comment ) {
                         displayComment(comment)
                     });
+                    adjustFooter();
                 });
 
 
@@ -216,6 +216,8 @@
 
                             $("#edit-text-"+id).replaceWith("<div id='"+id+"' class='comment-text'>"+ commentData.body +
                                 "</div>")
+
+                            adjustFooter();
                             }
                     })
                 }
@@ -227,9 +229,11 @@
                         dataType: 'json',
                         success: function(data){
                             $("#comment-"+id ).remove()
+                            adjustFooter();
                         }
                     });
                 }
+
             });
         </script>
     </body>

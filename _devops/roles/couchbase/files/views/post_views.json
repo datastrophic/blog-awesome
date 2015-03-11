@@ -6,10 +6,11 @@
         "by_draft" : {
             "map" : "function (doc, meta) {\n   if (doc.date) {\n   emit([doc.isDraft, doc.date], null);\n } \n}"
         },
-        "pub_ids" : {
-            "map" : "function (doc, meta) {\n   if (doc.isDraft == false) {\n   emit(null);\n } \n}"
+        "sitemap" : {
+            "map" : "function (doc, meta) {\n   if (doc.isDraft == false) {\n    emit(null);\n }\n}"
         }
     }
 }
+
 
 
