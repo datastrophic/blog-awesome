@@ -15,7 +15,7 @@
 - hosts: webapp
   sudo: True
   vars_prompt:
-      redeploy: Redeploy Nginx and Datadog [yes|no] ?
+      nginx_redeploy: Redeploy Nginx and Datadog [yes|no] ?
   vars_files:
     - config/couchbase.yml
     - config/application.yml
@@ -23,6 +23,6 @@
     - config/nginx.yml
     - config/securesocial.yml
   roles:
-    - { role: nginx, when: "redeploy == 'yes'" }
+    - { role: nginx, when: "nginx_redeploy == 'yes'" }
     - role: appdeploy
-    - { role: datadog, when: "redeploy == 'yes'" }
+    - { role: datadog, when: "nginx_redeploy == 'yes'" }
