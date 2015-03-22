@@ -3,11 +3,25 @@
 
 VAGRANTFILE_API_VERSION = "2"
 
+# Creating Ansible user for unified provisioning in different environments
+# You can ssh to created host without password using 'ansible' user
+$key = File.read("#{Dir.home}/.ssh/id_rsa.pub")
+$shell = <<SCRIPT
+if [[ $(id -u ansible 2>/dev/null) -eq 0 ]]; then
+  useradd -m ansible -s /bin/bash
+  mkdir -p /home/ansible/.ssh
+  echo "#{$key}" >> /home/ansible/.ssh/authorized_keys
+  chown -R ansible /home/ansible
+  echo 'ansible  ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+fi
+SCRIPT
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   base_box = "ubuntu/trusty64"
 
   config.ssh.insert_key = false
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
   config.vm.define :blog_awesome do |master|
     master.vm.box = base_box
@@ -18,6 +32,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
+  config.vm.provision "shell", inline: $shell
+
+  # Default provision for dev environment
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "playbook_dev.yml"
     ansible.verbose = "vvv"
