@@ -12,7 +12,7 @@
   when: couchbaseInstalled.stdout == '0'
 
 - name: cluster-init
-  action: shell /opt/couchbase/bin/couchbase-cli cluster-init -u {{ couchbase.admin_user }} -p {{ couchbase.admin_password }} -c {{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8091 --cluster-port=8091 --cluster-ramsize={{ couchbase.cluster_ram_quota }}
+  action: shell /opt/couchbase/bin/couchbase-cli cluster-init -u {{ couchbase.admin_user }} -p {{ couchbase.admin_password }} -c 127.0.0.1:8091 --cluster-port=8091 --cluster-ramsize={{ couchbase.cluster_ram_quota }}
   register: result
   until: result.stdout.find("SUCCESS") != -1
   retries: 10
@@ -28,11 +28,11 @@
   when: couchbaseInstalled.stdout == '0'
 
 - name: rebalancing the cluster
-  shell: /opt/couchbase/bin/couchbase-cli rebalance -c {{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8091 -u {{ couchbase.admin_user }} -p {{ couchbase.admin_password }}
+  shell: /opt/couchbase/bin/couchbase-cli rebalance -c 127.0.0.1:8091 -u {{ couchbase.admin_user }} -p {{ couchbase.admin_password }}
   when: couchbaseInstalled.stdout == '0'
 
 - name: creating buckets
-  shell: /opt/couchbase/bin/couchbase-cli bucket-create -c {{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8091 --bucket={{ item.value.name }} --bucket-password={{ item.value.password }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ item.value.ram_quota }}  --bucket-replica={{ item.value.replica_number }} -u {{ couchbase.admin_user }} -p {{ couchbase.admin_password }} --enable-flush={{ item.value.enable_flush }}
+  shell: /opt/couchbase/bin/couchbase-cli bucket-create -c 127.0.0.1:8091 --bucket={{ item.value.name }} --bucket-password={{ item.value.password }} --bucket-type=couchbase --bucket-port=11211 --bucket-ramsize={{ item.value.ram_quota }}  --bucket-replica={{ item.value.replica_number }} -u {{ couchbase.admin_user }} -p {{ couchbase.admin_password }} --enable-flush={{ item.value.enable_flush }}
   with_dict: couchbase.buckets
   when: couchbaseInstalled.stdout == '0'
 
@@ -43,7 +43,7 @@
   when: couchbaseInstalled.stdout == '0'
 
 - name: Uploading views
-  shell: "curl -X PUT -H 'Content-Type: application/json' http://{{ couchbase.admin_user }}:{{ couchbase.admin_password }}@{{ hostvars[inventory_hostname]['ansible_eth1']['ipv4']['address'] }}:8092/{{ item.1 }}/_design/{{ item.0.docname }} -d @/tmp/couchbase/views/{{ item.0.file }}"
+  shell: "curl -X PUT -H 'Content-Type: application/json' http://{{ couchbase.admin_user }}:{{ couchbase.admin_password }}@127.0.0.1:8092/{{ item.1 }}/_design/{{ item.0.docname }} -d @/tmp/couchbase/views/{{ item.0.file }}"
   with_subelements:
        - couchbase.design_docs
        - buckets

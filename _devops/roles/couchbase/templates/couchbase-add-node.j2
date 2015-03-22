@@ -1,5 +1,5 @@
 {% if 'couchbase-nodes' in groups %}
     {% for host in groups['couchbase-nodes'] %}
-        /opt/couchbase/bin/couchbase-cli server-add -c 127.0.0.1:8091 -u ${admin_user} -p ${admin_password} --server-add={{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}:8091 --server-add-username=${admin_user} --server-add-password=${admin_password}
+        /opt/couchbase/bin/couchbase-cli server-add -c 127.0.0.1:8091 -u ${couchbase.admin_user} -p ${couchbase.admin_password} --server-add={{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}:8091 --server-add-username=${couchbase.admin_user} --server-add-password=${couchbase.admin_password}
     {% endfor %}
 {% endif %}

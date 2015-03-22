@@ -24,7 +24,7 @@ class SiteMapController (postDao: PostDao) extends Controller{
 
       logger.info(s"${postIds.size} ids are read from DB")
 
-      Ok(buildSitemapXML(postIds))
+      Ok(buildSitemapXML(postIds)).as("text/xml")
   }
 
 

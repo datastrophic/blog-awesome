@@ -194,7 +194,7 @@ class PostService(postDao: PostDao, tagDao: TagDao, commentService: CommentServi
         s"${config.getString("current.host")}/favicon.png"
       }
 
-      val url = s"${config.getString("current.host")}/$uid"
+      val url = s"${config.getString("current.host")}/post/$uid"
 
       Some(Snippet(imageUrl = imgUrl, title = post.title, description = dataBlocks.head.data, url = url))
     } else {

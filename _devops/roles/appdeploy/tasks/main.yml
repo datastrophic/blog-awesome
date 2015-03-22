@@ -12,7 +12,7 @@
     - play.*
 
 - name: Moving to application HOME
-  shell: mkdir -p {{ application.application_home }}; mv -f /tmp/{{ application.dist_name }}/* {{ application.application_home }}
+  shell: mkdir -p {{ application.application_home }} && mv -f /tmp/{{ application.dist_name }}/* {{ application.application_home }}
 
 - name: Create shell script for launching the App
   action: template src=launch.sh.j2 dest={{ application.application_home }}/bin/launch.sh mode=755
