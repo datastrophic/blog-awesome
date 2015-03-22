@@ -1,3 +1,0 @@
-[submodule "_devops/prodconfig"]
-	path = _devops/prodconfig
-	url = git@github.com:akirillov/secure-configs.git
