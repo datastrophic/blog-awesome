@@ -2,13 +2,13 @@
 @import domain.Snippet
 
 <head>
-    <title>Blog Awesome</title>
+    <title>Datastrophic</title>
 
     @play.twirl.api.Html(
         snippet.map(_.toHtml).getOrElse(
          """<meta property="og:image" content="@routes.Assets.at("images/favicon.png")" />
-            |<meta property="og:title" content="Blog Awesome" />
-            |<meta property="og:description" content="WYSIWYG content editing engine for making perfect personal blogging without any stress" />""".stripMargin
+            |<meta property="og:title" content="Datastrophic" />
+            |<meta property="og:description" content="Datastrophic: a blog about distributed systems and software engineering" />""".stripMargin
         )
     )
 

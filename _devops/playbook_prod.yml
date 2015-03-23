@@ -5,7 +5,7 @@
   vars_prompt:
       redeploy: Full redeploy or application only [full|app] ?
   vars_files:
-    - config/couchbase.yml
+    - secure-config/datastrophic/couchbase.yml
   roles:
     - { role: common, when: "redeploy != 'app'" }
     - { role: oracle-java, when: "redeploy != 'app'" }
@@ -17,11 +17,11 @@
   vars_prompt:
       nginx_redeploy: Redeploy Nginx and Datadog [yes|no] ?
   vars_files:
-    - config/couchbase.yml
-    - config/application.yml
-    - config/datadog.yml
-    - config/nginx.yml
-    - config/securesocial.yml
+    - secure-config/datastrophic/couchbase.yml
+    - secure-config/datastrophic/application.yml
+    - secure-config/datastrophic/datadog.yml
+    - secure-config/datastrophic/nginx.yml
+    - secure-config/datastrophic/securesocial.yml
   roles:
     - { role: nginx, when: "nginx_redeploy == 'yes'" }
     - role: appdeploy
