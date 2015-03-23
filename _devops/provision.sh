@@ -4,8 +4,10 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 cd $DIR
 
+HOSTS=hosts
+
 function full_provision() {
-    ansible-playbook playbook_prod.yml -i hosts --extra-vars "config_dir=config redeploy=full nginx_redeploy=yes" -c ssh -u ansible --private-key=~/.ssh/id_rsa
+    ansible-playbook playbook_prod.yml -i $HOSTS --extra-vars "config_dir=config redeploy=full nginx_redeploy=yes" -c ssh -u ansible --private-key=~/.ssh/id_rsa
 }
 
 function vagrantRebuild() {
@@ -13,13 +15,13 @@ function vagrantRebuild() {
 }
 
 function app_redeploy() {
-    ansible-playbook playbook_prod.yml -i hosts --extra-vars "redeploy=app nginx_redeploy=no" -c ssh -u ansible --private-key=~/.ssh/id_rsa
+    ansible-playbook playbook_prod.yml -i $HOSTS --extra-vars "redeploy=app nginx_redeploy=no" -c ssh -u ansible --private-key=~/.ssh/id_rsa
 }
 
 function default_provision(){
     echo "=> Runing in default interactive mode"
     build_dist
-    ansible-playbook playbook_prod.yml -i hosts -c ssh -u ansible --private-key=~/.ssh/id_rsa
+    ansible-playbook playbook_prod.yml -i $HOSTS -c ssh -u ansible --private-key=~/.ssh/id_rsa
 }
 
 function build_dist(){
