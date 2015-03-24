@@ -59,3 +59,8 @@ Overview of configuration files located in `_devops/config` directory:
  * `datadog.yml` - you DataDog key for setting up proper monitoring and metrics domain to use with dashboards
  * `nginx.yml` contains only domain name and path to data directory from where static content is served
  * `securesocial.yml` contains `id's` and `tokens` for each supported provider. The values provided are targeted at localhost and must be modified in case you're going to prod. Here is SecureSocial [docs](http://securesocial.ws/guide/configuration.html)
+
+### OAuth/SecureSocial Configuration
+When using non-localhost address you should provide proper configuration for SecureSocial to login with
+ desired providers (like Facebook or Twitter). Check out appropriate section of [SecureSocial docs](http://securesocial.ws/guide/configuration.html).
+ You have to register at each website you want to use as OAuth provider to get appropriate keys.

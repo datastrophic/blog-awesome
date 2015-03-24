@@ -82,10 +82,11 @@
                     $self.replaceWith(markdown.toHTML($self.text()))
                 });
 
-
-                adjustFooter();
          });
 
+        $(window).bind("load", function() {
+            adjustFooter();
+        });
         </script>
     </body>
 
