@@ -24,6 +24,7 @@ object JsonPostTransformer {
   private val titleTransformer = (__ \ 'title).json.pick[JsString]
   private val typeTransformer = (__ \ 'type).json.pick[JsString]
   private val textTransformer = (__ \ 'data \ 'text).json.pick[JsString]
+  private val listTransformer = (__ \ 'data \ 'text).json.pick[JsString]
   private val imageTransformer = (__ \ 'data \ 'file \ 'url).json.pick[JsString]
   private val gistTransformer = (__ \ 'data \ 'id).json.pick[JsString]
 
@@ -36,6 +37,7 @@ object JsonPostTransformer {
     dataBlock.`type` match {
       case "text" => createTextBlock(dataBlock)
       case "image" => createImageBlock(dataBlock)
+      case "list" => createListBlock(dataBlock)
       case "gist" => createGistBlock(dataBlock)
       case _ => Json.obj()
     }
@@ -44,6 +46,15 @@ object JsonPostTransformer {
   private def createTextBlock(dataBlock: DataBlock): JsValue = {
     Json.obj(
       "type" -> "text",
+      "data" -> Json.obj(
+        "text" -> dataBlock.data
+      )
+    )
+  }
+
+  private def createListBlock(dataBlock: DataBlock): JsValue = {
+    Json.obj(
+      "type" -> "list",
       "data" -> Json.obj(
         "text" -> dataBlock.data
       )
@@ -106,6 +117,7 @@ object JsonPostTransformer {
       case "text" => getText(jsValue) flatMap (text => Some(DataBlock("text", text)))
       case "image" => getImage(jsValue) flatMap (url => Some(DataBlock("image", url)))
       case "gist" => getGist(jsValue) flatMap (gistId => Some(DataBlock("gist", gistId)))
+      case "list" => getList(jsValue) flatMap (list => Some(DataBlock("list", list)))
       case _ => None
     }
   }
@@ -114,6 +126,7 @@ object JsonPostTransformer {
   private def getText(jsValue: JsValue): Option[String] = getStringValue(jsValue, textTransformer)
   private def getType(jsValue: JsValue): Option[String] = getStringValue(jsValue, typeTransformer)
   private def getGist(jsValue: JsValue): Option[String] = getStringValue(jsValue, gistTransformer)
+  private def getList(jsValue: JsValue): Option[String] = getStringValue(jsValue, listTransformer)
 
   private def getStringValue(jsValue: JsValue, reads: Reads[JsString]): Option[String] = {
     jsValue.transform(reads) match {

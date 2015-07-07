@@ -20,7 +20,7 @@
         @navbar(user)(None)(editMode = true)
             <!-- Page Content -->
         <div class="container">
-            <div class="page-header" id="banner" style="padding-top: 60px;">
+            <div class="page-header" id="banner" style="padding-top: 60px; margin-bottom: 0px;">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
                         @if(title.isDefined){
@@ -52,7 +52,7 @@
         <script>
             new SirTrevor.Editor({
                 el: $("#postBody"),
-                blockTypes: ["Text", "Gist","Image", "Video"]
+                blockTypes: ["Text", "List", "Gist","Image", "Video"]
             });
 
             SirTrevor.setDefaults({

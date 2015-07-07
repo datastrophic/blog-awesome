@@ -13,7 +13,8 @@ h6,
 .h6 {
     font-family: 'Lato','Helvetica Neue','Source Sans Pro',Helvetica,Arial, sans-serif !important;
 }
-p {font-size: large}
+p {font-size: large; margin-bottom: 0px !important;}
+/*ul {margin-top: -20px;}*/
 
 .bootstrap-tags .tags {
     padding-left: 4px !important;

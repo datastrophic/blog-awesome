@@ -45,6 +45,11 @@
                                     case "text" => {
                                             <p class="md-content">{block.data}</p>
                                     }
+                                    case "list" => {
+                                        <div style="font-size: large !important;">
+                                            <p class="md-content">{block.data}</p>
+                                        </div>
+                                    }
                                     case "image" => {
                                             <div style="text-align: center">
                                             <p class="md-content">![]({block.data})</p>

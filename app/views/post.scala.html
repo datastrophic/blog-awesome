@@ -17,7 +17,7 @@
 
         <!-- Page Content -->
         <div class="container">
-            <div class="page-header" id="banner">
+            <div class="page-header" id="banner" style="margin-bottom: 0px;">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
                         <h1>@post.title</h1>
@@ -43,13 +43,19 @@
                             <p class="md-content">@{block.data}</p>
                         } 
 
+                        @if(block.`type` == "list") {
+                            <div style="font-size: large !important; margin-top: -10px !important">
+                                <p class="md-content">@{block.data}</p>
+                            </div>
+                        } 
+
                         @if(block.`type` == "gist") {
                             <code data-gist-id="@{block.data}"></code>
                         }
 
                         @if(block.`type` == "image") {
-                            <div style="text-align: center">
-                                <p class="md-content">![](@{block.data})</p>
+                            <div style="text-align: center;">
+                                <p class="md-content" style="margin-bottom: 10px !important;">![](@{block.data})</p>
                             </div>
                         }
                     }
